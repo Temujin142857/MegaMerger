@@ -3,30 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
-	"runtime"
 )
 
 func VisualizeGraph(nodes []Node, name string) error {
 
 	dotFile := name + ".dot"
-	pngFile := name + ".png"
 
 	err := writeDOT(nodes, dotFile)
 	if err != nil {
 		return err
 	}
-
-	// Run Graphviz
-	cmd := exec.Command("neato", "-Tpng", dotFile, "-o", pngFile)
-	err = cmd.Run()
-	if err != nil {
-		return fmt.Errorf("graphviz failed: %w", err)
-	}
-
-	// Open image automatically
-	openImage(pngFile)
-
 	return nil
 }
 
@@ -49,7 +35,7 @@ func writeDOT(nodes []Node, filename string) error {
 			shape = "doublecircle"
 		}
 
-		label := fmt.Sprintf("%d\\nL%d\\n%s", n.name, n.level, n.state)
+		label := fmt.Sprintf("%d", n.name)
 
 		fmt.Fprintf(
 			f,
@@ -83,22 +69,4 @@ func writeDOT(nodes []Node, filename string) error {
 
 	fmt.Fprintln(f, "}")
 	return nil
-}
-
-func openImage(file string) {
-
-	var cmd *exec.Cmd
-
-	switch runtime.GOOS {
-	case "linux":
-		cmd = exec.Command("xdg-open", file)
-	case "darwin":
-		cmd = exec.Command("open", file)
-	case "windows":
-		cmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", file)
-	default:
-		return
-	}
-
-	cmd.Start()
 }
