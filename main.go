@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math/rand/v2"
 	"sync"
+	//"gg"
 )
 
 type Message struct {
@@ -18,7 +20,7 @@ type Node struct {
 	city      int
 	parent    int
 	children  []int
-	edges     []chan Message
+	edges     []Vertex
 	state     string
 	initiator bool
 }
@@ -37,7 +39,7 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	setup(5, 7)
+	setup(5, 7, 2)
 	for _, node := range nodes {
 		wg.Go(func() { instructions(node) })
 	}
@@ -45,14 +47,28 @@ func main() {
 	wg.Wait()
 }
 
-func setup(upperBoundOfNodes int, averageConnections int) {
-	//populate nodes
-	//connect nodes
-	//set some to initiators
+func setup(upperBoundOfNodes int, connectionsNum int, initiatorNum int) {
+	for i := 1; i < upperBoundOfNodes+1; i++ {
+		node := Node{name: i, level: 0, city: -1, parent: -1, state: "asleep", initiator: false}
+		nodes = append(nodes, node)
+		if i < initiatorNum {
+			nodes[i].initiator = true
+		}
+	}
+	for i := 0; i < connectionsNum; i++ {
+		n1 := rand.IntN(upperBoundOfNodes)
+		n2 := rand.IntN(upperBoundOfNodes)
+		for n2 == n1 {
+			n2 = rand.IntN(upperBoundOfNodes)
+		}
+		connect(i, nodes[n1], nodes[n2])
+	}
 }
 
-func connect(node1 Node, node2 Node) {
-
+func connect(i int, node1 Node, node2 Node) {
+	v := Vertex{name: i, node1: node1.name, node2: node2.name, channel: make(chan Message)}
+	node1.edges = append(node1.edges, v)
+	node2.edges = append(node2.edges, v)
 }
 
 func instructions(node Node) {
@@ -61,4 +77,8 @@ func instructions(node Node) {
 
 func transmit() {
 
+}
+
+func drawGraph() {
+	//DrawCircle(x, y, r)
 }
