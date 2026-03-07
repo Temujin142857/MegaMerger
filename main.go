@@ -20,6 +20,7 @@ type Node struct {
 	parent    int
 	children  []int
 	edges     []Vertex
+	neighbors map[int]int
 	state     string
 	initiator bool
 }
@@ -54,18 +55,22 @@ func setup(upperBoundOfNodes int, connectionsNum int, initiatorNum int) {
 	}
 	for i := 0; i < connectionsNum; i++ {
 		n1 := rand.IntN(upperBoundOfNodes)
+		for len(nodes[n1].edges)>=upperBoundOfNodes{
+			n1 := rand.IntN(upperBoundOfNodes)
+		}
 		n2 := rand.IntN(upperBoundOfNodes)
-		for n2 == n1 {
+		for n2 == n1 || nodes[n1].neighbors[n2]==1{
 			n2 = rand.IntN(upperBoundOfNodes)
 		}
-		connect(i, nodes[n1], nodes[n2])
+		connect(i, &nodes[n1], &nodes[n2])
 	}
 	VisualizeGraph(nodes, "network")
 }
 
-func connect(i int, node1 Node, node2 Node) {
+func connect(i int, node1 *Node, node2 *Node) {
 	v := Vertex{name: i, node1: node1.name, node2: node2.name, channel: make(chan Message)}
 	node1.edges = append(node1.edges, v)
+	node1.neighbors[]
 	node2.edges = append(node2.edges, v)
 }
 
