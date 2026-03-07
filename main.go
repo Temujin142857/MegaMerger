@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math/rand/v2"
 	"sync"
 	//"gg"
@@ -35,8 +34,6 @@ type Vertex struct {
 var nodes []Node
 
 func main() {
-	fmt.Printf("hello world")
-
 	var wg sync.WaitGroup
 
 	setup(5, 7, 2)
@@ -51,8 +48,8 @@ func setup(upperBoundOfNodes int, connectionsNum int, initiatorNum int) {
 	for i := 1; i < upperBoundOfNodes+1; i++ {
 		node := Node{name: i, level: 0, city: -1, parent: -1, state: "asleep", initiator: false}
 		nodes = append(nodes, node)
-		if i < initiatorNum {
-			nodes[i].initiator = true
+		if i-1 < initiatorNum {
+			nodes[i-1].initiator = true
 		}
 	}
 	for i := 0; i < connectionsNum; i++ {
@@ -63,6 +60,7 @@ func setup(upperBoundOfNodes int, connectionsNum int, initiatorNum int) {
 		}
 		connect(i, nodes[n1], nodes[n2])
 	}
+	VisualizeGraph(nodes, "network")
 }
 
 func connect(i int, node1 Node, node2 Node) {
@@ -81,4 +79,5 @@ func transmit() {
 
 func drawGraph() {
 	//DrawCircle(x, y, r)
+
 }
