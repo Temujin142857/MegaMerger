@@ -1,7 +1,8 @@
 package main
 
 import (
-	"math/rand/v2"
+	"flag"
+	"fmt"
 	"sync"
 	//"gg"
 )
@@ -32,57 +33,62 @@ type Vertex struct {
 	channel chan Message
 }
 
-var nodes []Node
+var nodes map[int]Node = make(map[int]Node)
+
+var (
+	fileFlag     bool
+	filePath     string
+	withWeight   bool
+	initiatorNum int
+)
+
+func init() {
+	flag.BoolVar(&fileFlag, "fileFlag", false, "Wether making graph from file or rand")
+	flag.StringVar(&filePath, "filePath", "default", "name of file with graph")
+	flag.BoolVar(&withWeight, "withWeight", false, "Wether the file has weights")
+	flag.IntVar(&initiatorNum, "initiatorNum", 1, "How many itiators")
+}
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Error:\n", r)
+		}
+	}()
+
+	flag.Parse()
+	fmt.Println("fileFlag:", fileFlag, ", filePath:", filePath, ", withWeight:", withWeight)
+
 	var wg sync.WaitGroup
 
-	setup(5, 7, 2)
+	if fileFlag {
+		fileSetup(filePath, withWeight, initiatorNum)
+	} else {
+		randomSetup(5, 7, 2)
+	}
+	fmt.Println(nodes)
+	VisualizeGraph(nodes, "network")
+
 	for _, node := range nodes {
-		wg.Go(func() { instructions(node) })
+		wg.Go(func() { instructions(&node) })
 	}
 
 	wg.Wait()
 }
 
-func setup(upperBoundOfNodes int, connectionsNum int, initiatorNum int) {
-	for i := 1; i < upperBoundOfNodes+1; i++ {
-		node := Node{name: i, level: 0, city: -1, parent: -1, state: "asleep", initiator: false}
-		nodes = append(nodes, node)
-		if i-1 < initiatorNum {
-			nodes[i-1].initiator = true
-		}
-	}
-	for i := 0; i < connectionsNum; i++ {
-		n1 := rand.IntN(upperBoundOfNodes)
-		for len(nodes[n1].edges)>=upperBoundOfNodes{
-			n1 := rand.IntN(upperBoundOfNodes)
-		}
-		n2 := rand.IntN(upperBoundOfNodes)
-		for n2 == n1 || nodes[n1].neighbors[n2]==1{
-			n2 = rand.IntN(upperBoundOfNodes)
-		}
-		connect(i, &nodes[n1], &nodes[n2])
-	}
-	VisualizeGraph(nodes, "network")
-}
+func instructions(node *Node) {
+	if node.initiator {
 
-func connect(i int, node1 *Node, node2 *Node) {
-	v := Vertex{name: i, node1: node1.name, node2: node2.name, channel: make(chan Message)}
-	node1.edges = append(node1.edges, v)
-	node1.neighbors[]
-	node2.edges = append(node2.edges, v)
-}
+	}
 
-func instructions(node Node) {
+	for true {
+		break
+		fmt.Println("wtf")
+	}
+	fmt.Println("done")
 
 }
 
 func transmit() {
-
-}
-
-func drawGraph() {
-	//DrawCircle(x, y, r)
 
 }

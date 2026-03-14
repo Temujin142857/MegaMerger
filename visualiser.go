@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func VisualizeGraph(nodes []Node, name string) error {
+func VisualizeGraph(nodes map[int]Node, name string) error {
 
 	dotFile := name + ".dot"
 
@@ -13,10 +13,11 @@ func VisualizeGraph(nodes []Node, name string) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func writeDOT(nodes []Node, filename string) error {
+func writeDOT(nodes map[int]Node, filename string) error {
 
 	f, err := os.Create(filename)
 	if err != nil {
