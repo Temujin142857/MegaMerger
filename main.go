@@ -3,15 +3,22 @@ package main
 import (
 	"flag"
 	"fmt"
+	"reflect"
 	"sync"
 	//"gg"
 )
 
+type edgePath struct {
+	edges []int
+}
+
 type Message struct {
-	catagory string
-	sender   int
-	level    int
-	city     int
+	catagory        string
+	sender          int
+	level           int
+	city            int
+	callbackPath    edgePath
+	destinationPath edgePath
 }
 
 type Node struct {
@@ -78,17 +85,60 @@ func main() {
 
 func instructions(node *Node) {
 	if node.initiator {
+		start(node)
+	}
 
+	cases := make([]reflect.SelectCase, len(node.edges))
+	for i, ch := range node.edges {
+		cases[i] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(ch)}
 	}
 
 	for true {
-		break
-		fmt.Println("wtf")
+
+		chosen, value, ok := reflect.Select(cases)
+		if ok {
+			panic("unexpected channel closed")
+		}
+		senderIndex := node.edges[chosen]
+		message := value.String()
+
+		switch {
+		case message == "" && node.state == "":
+			fmt.Println("")
+		case message == "a" && node.state == "":
+
+		case message == "complete":
+
+		}
+		if node.state == "done" {
+			break
+		}
 	}
 	fmt.Println("done")
 
 }
 
-func transmit() {
+func start(node *Node) {
+	node.state = "Downtown"
+	path := findSmallestExternalEdge(node)
 
+}
+
+func findSmallestExternalEdge(node *Node) int { return 0 }
+
+func (s *edgePath) Push(item int) {
+	s.edges = append(s.edges, item)
+}
+
+func (s *edgePath) Pop() (int, bool) {
+	if len(s.edges) == 0 {
+		return 0, false
+	}
+	item := s.edges[len(s.edges)-1]
+	s.edges = s.edges[:len(s.edges)-1]
+	return item, true
+}
+
+func (s *edgePath) IsEmpty() bool {
+	return len(s.edges) == 0
 }
