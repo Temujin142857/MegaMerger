@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 OPR/128.0.0.0 (Edition ms_store_gx)" version="29.6.4">
   <diagram name="Page-1" id="IRjHNXaowiygX4C5sSkh">
-    <mxGraphModel dx="6055" dy="4040" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2238" dy="1884" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -341,7 +341,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-161" parent="1" style="swimlane;startSize=0;strokeColor=light-dark(#000000,#FFFFFF);" value="" vertex="1">
-          <mxGeometry height="1460" width="1070" x="170" y="2190" as="geometry">
+          <mxGeometry height="1460" width="1070" x="1570" y="-790" as="geometry">
             <mxRectangle height="40" width="50" x="130" y="-310" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -532,6 +532,48 @@
             <mxPoint x="760" y="170" as="sourcePoint" />
             <mxPoint x="760" y="230" as="targetPoint" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-257" parent="1" style="swimlane;startSize=0;" value="" vertex="1">
+          <mxGeometry height="740" width="790" x="1550" y="820" as="geometry">
+            <mxRectangle height="40" width="50" x="130" y="-310" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-260" edge="1" parent="Reka6r6GEI1tk0mXe-2V-257" source="Reka6r6GEI1tk0mXe-2V-262" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="Reka6r6GEI1tk0mXe-2V-266" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="110" y="290" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-283" edge="1" parent="Reka6r6GEI1tk0mXe-2V-257" source="Reka6r6GEI1tk0mXe-2V-262" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="Reka6r6GEI1tk0mXe-2V-282" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="100" y="540" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-262" parent="Reka6r6GEI1tk0mXe-2V-257" style="ellipse;whiteSpace=wrap;html=1;" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;waitingToReply&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="30" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-280" edge="1" parent="Reka6r6GEI1tk0mXe-2V-257" source="Reka6r6GEI1tk0mXe-2V-266" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;dashed=1;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="400" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-266" parent="Reka6r6GEI1tk0mXe-2V-257" style="whiteSpace=wrap;html=1;strokeColor=light-dark(#000000,#FFFFFF);" value="&lt;div&gt;Level changes&lt;br&gt;if new level&amp;gt;storedLevel of request&lt;br&gt;reply &quot;getAbsorbed&quot;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="220" x="290" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-281" parent="Reka6r6GEI1tk0mXe-2V-257" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" value="&lt;div&gt;type: getAbsorbed&lt;/div&gt;&lt;div&gt;city, level, no callback&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="310" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-285" edge="1" parent="Reka6r6GEI1tk0mXe-2V-257" source="Reka6r6GEI1tk0mXe-2V-282" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="Reka6r6GEI1tk0mXe-2V-284" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-282" parent="Reka6r6GEI1tk0mXe-2V-257" style="whiteSpace=wrap;html=1;" value="reicives merge request from parent, with, with the destination the same as the node waiting on a reply" vertex="1">
+          <mxGeometry height="90" width="180" x="290" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-284" parent="Reka6r6GEI1tk0mXe-2V-257" style="whiteSpace=wrap;html=1;" value="send merge accepted to the waitng node and parent, with the new city name and level" vertex="1">
+          <mxGeometry height="105" width="160" x="570" y="502.5" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
