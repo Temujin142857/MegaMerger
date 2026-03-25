@@ -41,7 +41,7 @@ type Vertex struct {
 	channel chan Message
 }
 
-func instructions(node *Node) {
+func instructions(node *Node, complexity *int) {
 	if node.initiator {
 		start(node)
 	}
@@ -73,10 +73,13 @@ func instructions(node *Node) {
 		}
 	}
 	fmt.Println("done")
-
 }
 
 func findSmallestExternalEdge(node *Node) int { return 0 }
+
+func sendMessage(node *Node, target int, complexity *int) {
+	*complexity++
+}
 
 func start(node *Node) {
 	node.state = "Downtown"

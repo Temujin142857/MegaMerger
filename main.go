@@ -36,7 +36,7 @@ func main() {
 
 	switch procedureNum {
 	case 0:
-		fileSetup(filePath, withWeight, nodeNum)
+		runFromFile(filePath, withWeight, nodeNum)
 		break
 	case 1:
 		procedure1(nodeNum)
@@ -44,7 +44,13 @@ func main() {
 	case 2:
 		procedure2()
 	}
+}
 
+func runFromFile(filepath string, withWeight bool, nodeNum int) {
+	var nodes map[int]Node = make(map[int]Node)
+	fileSetup(filePath, withWeight, nodeNum, nodes)
+	complexity := 0
+	runAlgorithm(nodes, &complexity)
 }
 
 func procedure1(n int) [4]int {
@@ -69,7 +75,8 @@ func procedure1(n int) [4]int {
 		for j := 0; j < 1000; j++ {
 			var nodes map[int]Node = make(map[int]Node)
 			generateRandomGraph(n, m, n, nodes)
-			complexity := runAlgorithm(nodes)
+			complexity := 0
+			runAlgorithm(nodes, &complexity)
 			totalComplexity += complexity
 		}
 		averageComplexities[i] = totalComplexity / 1000
@@ -91,7 +98,8 @@ func procedure2() [4]int {
 		for j := 0; j < 1000; j++ {
 			var nodes map[int]Node = make(map[int]Node)
 			generateRandomGraph(n, m, n, nodes)
-			complexity := runAlgorithm(nodes)
+			complexity := 0
+			runAlgorithm(nodes, &complexity)
 			totalComplexity += complexity
 		}
 		averageComplexities[i] = totalComplexity / 1000
@@ -99,14 +107,13 @@ func procedure2() [4]int {
 	return averageComplexities
 }
 
-func runAlgorithm(nodes map[int]Node) int {
+func runAlgorithm(nodes map[int]Node, complexity *int) {
 	var wg sync.WaitGroup
 	for _, node := range nodes {
-		wg.Go(func() { instructions(&node) })
+		wg.Go(func() { instructions(&node, complexity) })
 	}
 
 	wg.Wait()
 
 	VisualizeGraph(nodes, "network")
-	return 0
 }
