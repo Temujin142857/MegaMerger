@@ -4,6 +4,10 @@
 How should initiators be chosen?
 Does the one goroutine per node make sense for simulating a distrubed system
 
+## install instructions
+go install github.com/goccy/go-graphviz/cmd/dot@latest
+go build main.go setup.go visualiser.go graph.go megamergerInstructions.go
+./main -procedureNum 0 -filePath "C:\Users\Tomio\Programming\MegaMerger\input\edgeList.csv"
 
 ## Citations:
 
