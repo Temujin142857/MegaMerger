@@ -54,18 +54,18 @@ func instructions(node *Node, complexity *int) {
 	for true {
 
 		chosen, value, ok := reflect.Select(cases)
-		if ok {
+		if !ok {
 			panic("unexpected channel closed")
 		}
 		senderIndex := node.edges[chosen]
-		message := value.String()
+		message := value.Interface().(Message)
 
 		switch {
-		case message == "" && node.state == "":
+		case message.catagory == "" && node.state == "":
 			fmt.Println("")
-		case message == "a" && node.state == "":
+		case message.catagory == "a" && node.state == "":
 
-		case message == "complete":
+		case message.catagory == "complete":
 
 		}
 		if node.state == "done" {
@@ -77,6 +77,7 @@ func instructions(node *Node, complexity *int) {
 
 func findSmallestExternalEdge(node *Node) int { return 0 }
 
+// start here next time
 func sendMessage(node *Node, target int, complexity *int) {
 	*complexity++
 }
