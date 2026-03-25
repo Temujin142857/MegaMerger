@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 var STATES = [...]string{"DOWNTOWN", "ASLEEP", "VILLAGE", "DONE"}
 var MESSAGE_CATEGORIES = [...]string{"FIND_SMALLEST_FRINGE_EDGE", "SMALLEST_FRINGE_EDGE_FOUND", "MERE_REQUEST", "MERGE_REQUESTED", "GET_ABSORBED", "WE_ABSORBED_THEM", "CITY_CHECK"}
 var SUB_STATES = [...]string{"WAITING_TO_REPLY"}
@@ -21,6 +17,7 @@ type Message struct {
 	destinationPath edgePath
 }
 
+// parent and children are indexes for the edges array
 type Node struct {
 	name      int
 	level     int
@@ -38,44 +35,6 @@ type Vertex struct {
 	name  int
 	node1 *Node
 	node2 *Node
-}
-
-func instructions(node *Node, complexity *int) {
-	if node.initiator {
-		start(node)
-	}
-
-	for true {
-
-		message := <-node.inbox
-		//senderIndex := message.sender
-
-		switch {
-		case message.catagory == "" && node.state == "":
-			fmt.Println("")
-		case message.catagory == "a" && node.state == "":
-
-		case message.catagory == "complete":
-
-		}
-		if node.state == "done" {
-			break
-		}
-	}
-	fmt.Println("done")
-}
-
-func findSmallestExternalEdge(node *Node) int { return 0 }
-
-// start here next time
-func sendMessage(node *Node, target int, complexity *int) {
-	*complexity++
-}
-
-func start(node *Node) {
-	node.state = "Downtown"
-	//path := findSmallestExternalEdge(node)
-
 }
 
 func (s *edgePath) Push(item int) {
