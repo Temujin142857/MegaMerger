@@ -1,6 +1,8 @@
 # MegaMerger Implementation
 
-
+## Things to ask:
+How should initiators be chosen?
+Does the one goroutine per node make sense for simulating a distrubed system
 
 
 ## Citations:

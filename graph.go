@@ -48,7 +48,7 @@ func instructions(node *Node, complexity *int) {
 	for true {
 
 		message := <-node.inbox
-		senderIndex := message.sender
+		//senderIndex := message.sender
 
 		switch {
 		case message.catagory == "" && node.state == "":
@@ -74,7 +74,7 @@ func sendMessage(node *Node, target int, complexity *int) {
 
 func start(node *Node) {
 	node.state = "Downtown"
-	path := findSmallestExternalEdge(node)
+	//path := findSmallestExternalEdge(node)
 
 }
 
