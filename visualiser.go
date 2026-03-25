@@ -3,18 +3,37 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"path/filepath"
 )
+
+var dotFolderPath = filepath.Join("output", "dotFolder")
+var pngFolderPath = filepath.Join("output", "pngFolder")
 
 func VisualizeGraph(nodes map[int]Node, name string) error {
 
-	dotFile := name + ".dot"
+	dotFile := filepath.Join(dotFolderPath, name+".dot")
+	pngFile := filepath.Join(pngFolderPath, name+".png")
 
 	err := writeDOT(nodes, dotFile)
 	if err != nil {
 		return err
 	}
 
+	writePNG(dotFile, pngFile)
+
 	return nil
+}
+
+func setupOutputFolder() {
+	err := os.MkdirAll("output/dotFolder", 0755)
+	if err != nil {
+		panic(err)
+	}
+	err = os.MkdirAll("output/pngFolder", 0755)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func writeDOT(nodes map[int]Node, filename string) error {
@@ -70,4 +89,11 @@ func writeDOT(nodes map[int]Node, filename string) error {
 
 	fmt.Fprintln(f, "}")
 	return nil
+}
+
+func writePNG(dotFilePath string, pngFilePath string) {
+	cmd := exec.Command("dot", "-Tpng", "-Kdot", "-o", pngFilePath, dotFilePath)
+	if err := cmd.Run(); err != nil {
+		panic(err)
+	}
 }
