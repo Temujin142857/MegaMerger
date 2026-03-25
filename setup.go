@@ -92,7 +92,7 @@ func fileSetup(filePath string, withWeight bool, initiatorNum int, nodes map[int
 func connect(i int, n1 int, n2 int, nodes map[int]Node) {
 	node1 := nodes[n1]
 	node2 := nodes[n2]
-	v := Vertex{name: i, node1: node1.name, node2: node2.name, channel: make(chan Message)}
+	v := Vertex{name: i, node1: &node1, node2: &node2}
 	node1.edges = append(node1.edges, v)
 	node1.neighbors[node2.name] = 1
 	nodes[n1] = node1

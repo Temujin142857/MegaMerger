@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"reflect"
 )
 
 var STATES = [...]string{"DOWNTOWN", "ASLEEP", "VILLAGE", "DONE"}
@@ -32,13 +31,13 @@ type Node struct {
 	neighbors map[int]int
 	state     string
 	initiator bool
+	inbox     chan Message
 }
 
 type Vertex struct {
-	name    int
-	node1   int
-	node2   int
-	channel chan Message
+	name  int
+	node1 *Node
+	node2 *Node
 }
 
 func instructions(node *Node, complexity *int) {
@@ -46,19 +45,10 @@ func instructions(node *Node, complexity *int) {
 		start(node)
 	}
 
-	cases := make([]reflect.SelectCase, len(node.edges))
-	for i, ch := range node.edges {
-		cases[i] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(ch)}
-	}
-
 	for true {
 
-		chosen, value, ok := reflect.Select(cases)
-		if !ok {
-			panic("unexpected channel closed")
-		}
-		senderIndex := node.edges[chosen]
-		message := value.Interface().(Message)
+		message := <-node.inbox
+		senderIndex := message.sender
 
 		switch {
 		case message.catagory == "" && node.state == "":
