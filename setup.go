@@ -9,31 +9,46 @@ import (
 	s "strings"
 )
 
-func randomSetup(upperBoundOfNodes int, connectionsNum int, initiatorNum int) {
-	for i := 0; i < upperBoundOfNodes; i++ {
+func generateRandomGraph(nodesNum int, connectionsNum int, initiatorNum int, nodes map[int]Node) {
+	for i := 0; i < nodesNum; i++ {
 		initiator := false
 		if i < initiatorNum {
 			initiator = true
 		}
 		nodes[i] = Node{name: i, level: 0, city: -1, parent: -1, state: "asleep", initiator: initiator, neighbors: make(map[int]int)}
 	}
-	//fmt.Println(nodes)
-	for i := 0; i < connectionsNum; i++ {
-		n1 := rand.IntN(upperBoundOfNodes)
-		for len(nodes[n1].edges) >= upperBoundOfNodes {
-			n1 = rand.IntN(upperBoundOfNodes)
-		}
-		n2 := rand.IntN(upperBoundOfNodes)
+	//first give each node an edge, so they are not isolated
+	i := 0
+	for i < nodesNum {
+		n1 := i
+		n2 := rand.IntN(nodesNum)
 		for n2 == n1 || nodes[n1].neighbors[n2] == 1 || nodes[n2].neighbors[n1] == 1 {
-			n2 = rand.IntN(upperBoundOfNodes)
+			n2 = rand.IntN(nodesNum)
 		}
 		fmt.Println(n1, ",", n2)
 		fmt.Println(nodes[n1].neighbors[n2])
-		connect(i, n1, n2)
+		connect(i, n1, n2, nodes)
+		i++
+	}
+
+	//then assign the rest randomly
+	for i < connectionsNum {
+		n1 := rand.IntN(nodesNum)
+		for len(nodes[n1].edges) >= nodesNum {
+			n1 = rand.IntN(nodesNum)
+		}
+		n2 := rand.IntN(nodesNum)
+		for n2 == n1 || nodes[n1].neighbors[n2] == 1 || nodes[n2].neighbors[n1] == 1 {
+			n2 = rand.IntN(nodesNum)
+		}
+		fmt.Println(n1, ",", n2)
+		fmt.Println(nodes[n1].neighbors[n2])
+		connect(i, n1, n2, nodes)
+		i++
 	}
 }
 
-func fileSetup(filePath string, withWeight bool, initiatorNum int) {
+func fileSetup(filePath string, withWeight bool, initiatorNum int, nodes map[int]Node) {
 	file, err := os.Open(filePath)
 	check(err)
 	defer file.Close()
@@ -68,13 +83,13 @@ func fileSetup(filePath string, withWeight bool, initiatorNum int) {
 				}
 				nodes[n2] = Node{name: n2, level: 0, city: -1, parent: -1, state: "asleep", initiator: initiator, neighbors: make(map[int]int)}
 			}
-			connect(i, n1, n2)
+			connect(i, n1, n2, nodes)
 		}
 		i++
 	}
 }
 
-func connect(i int, n1 int, n2 int) {
+func connect(i int, n1 int, n2 int, nodes map[int]Node) {
 	node1 := nodes[n1]
 	node2 := nodes[n2]
 	v := Vertex{name: i, node1: node1.name, node2: node2.name, channel: make(chan Message)}
