@@ -61,8 +61,8 @@ func writeDOT(nodes map[int]Node, filename string) error {
 			fmt.Fprintf(
 				f,
 				"  %d -- %d [label=\"v%d\"];\n",
-				v.node1,
-				v.node2,
+				v.node1.name,
+				v.node2.name,
 				v.name,
 			)
 		}
