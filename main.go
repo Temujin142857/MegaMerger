@@ -8,8 +8,6 @@ import (
 	//"gg"
 )
 
-//var nodes map[int]Node = make(map[int]Node)
-
 var (
 	procedureNum int
 	filePath     string
@@ -48,6 +46,7 @@ func main() {
 
 func runFromFile(filepath string, withWeight bool, nodeNum int) {
 	var nodes map[int]Node = make(map[int]Node)
+	//note here nodenum is the amount of initiators
 	fileSetup(filePath, withWeight, nodeNum, nodes)
 	complexity := 0
 	runAlgorithm(nodes, &complexity)
@@ -74,6 +73,7 @@ func procedure1(n int) [4]int {
 		totalComplexity := 0
 		for j := 0; j < 1000; j++ {
 			var nodes map[int]Node = make(map[int]Node)
+			//note we currently make every node an initiator
 			generateRandomGraph(n, m, n, nodes)
 			complexity := 0
 			runAlgorithm(nodes, &complexity)
@@ -97,6 +97,7 @@ func procedure2() [4]int {
 		totalComplexity := 0
 		for j := 0; j < 1000; j++ {
 			var nodes map[int]Node = make(map[int]Node)
+			//note we currently make every node an initiator
 			generateRandomGraph(n, m, n, nodes)
 			complexity := 0
 			runAlgorithm(nodes, &complexity)
