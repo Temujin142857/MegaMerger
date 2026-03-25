@@ -34,17 +34,15 @@ func main() {
 
 	switch procedureNum {
 	case 0:
-		runFromFile(filePath, withWeight, nodeNum)
-		break
+		runFromFile()
 	case 1:
 		procedure1(nodeNum)
-		break
 	case 2:
 		procedure2()
 	}
 }
 
-func runFromFile(filepath string, withWeight bool, nodeNum int) {
+func runFromFile() {
 	var nodes map[int]Node = make(map[int]Node)
 	//note here nodenum is the amount of initiators
 	fileSetup(filePath, withWeight, nodeNum, nodes)
@@ -60,16 +58,12 @@ func procedure1(n int) [4]int {
 		switch i {
 		case 0:
 			m = n
-			break
 		case 1:
 			m = n * int(math.Round(math.Log2(float64(n))))
-			break
 		case 2:
 			m = n * int(math.Sqrt(float64(n)))
-			break
 		case 3:
 			m = n ^ 2
-			break
 		}
 		totalComplexity := 0
 		for j := 0; j < 1000; j++ {
