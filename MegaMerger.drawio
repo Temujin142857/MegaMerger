@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 OPR/128.0.0.0 (Edition ms_store_gx)" version="29.6.4">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 OPR/128.0.0.0" version="29.6.6">
   <diagram name="Page-1" id="IRjHNXaowiygX4C5sSkh">
-    <mxGraphModel dx="2151" dy="1878" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2183" dy="1881" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -30,7 +30,7 @@
           <mxGeometry height="30" width="140" y="30" as="geometry" />
         </mxCell>
         <mxCell id="cC38ddj740yCJfBzcajM-57" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="Types of messages" vertex="1">
-          <mxGeometry height="240" width="190" x="-280" y="-80" as="geometry">
+          <mxGeometry height="270" width="190" x="-280" y="-80" as="geometry">
             <mxRectangle height="30" width="70" x="-70" y="-80" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -55,8 +55,11 @@
         <mxCell id="cC38ddj740yCJfBzcajM-64" parent="cC38ddj740yCJfBzcajM-57" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="cityCheck" vertex="1">
           <mxGeometry height="30" width="190" y="210" as="geometry" />
         </mxCell>
+        <mxCell id="ZkR9ZcXwZnaupmHbknSt-1" parent="cC38ddj740yCJfBzcajM-57" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="terminationBroadcast" vertex="1">
+          <mxGeometry height="30" width="190" y="240" as="geometry" />
+        </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-40" parent="1" style="swimlane;startSize=0;" value="" vertex="1">
-          <mxGeometry height="1270" width="1210" x="170" y="-610" as="geometry">
+          <mxGeometry height="1410" width="1210" x="170" y="-580" as="geometry">
             <mxRectangle height="40" width="50" x="130" y="-310" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -165,7 +168,7 @@
             <mxPoint x="955" y="190" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="Reka6r6GEI1tk0mXe-2V-66" parent="Reka6r6GEI1tk0mXe-2V-40" style="whiteSpace=wrap;html=1;" value="send merge request along path" vertex="1">
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-66" parent="Reka6r6GEI1tk0mXe-2V-40" style="whiteSpace=wrap;html=1;" value="send merge request along callback path" vertex="1">
           <mxGeometry height="60" width="120" x="895" y="230" as="geometry" />
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-67" parent="Reka6r6GEI1tk0mXe-2V-40" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" value="&lt;div&gt;type: &quot;mergeRequest&quot;&lt;/div&gt;&lt;div&gt;level, city, callback&lt;/div&gt;" vertex="1">
@@ -226,8 +229,21 @@
             <mxPoint x="560" y="870" as="targetPoint" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="ZkR9ZcXwZnaupmHbknSt-2" edge="1" parent="Reka6r6GEI1tk0mXe-2V-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="450" y="1330" />
+              <mxPoint x="598" y="1330" />
+            </Array>
+            <mxPoint x="450" y="630" as="sourcePoint" />
+            <mxPoint x="598" y="1330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZkR9ZcXwZnaupmHbknSt-3" parent="Reka6r6GEI1tk0mXe-2V-40" style="whiteSpace=wrap;html=1;strokeColor=light-dark(#000000,#FF0000);" value="&lt;div&gt;type: terminationBroadcast&lt;/div&gt;&lt;div&gt;city&lt;/div&gt;&lt;div&gt;Should never recieve&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="170" x="600" y="1300" as="geometry" />
+        </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-121" parent="1" style="swimlane;startSize=0;" value="" vertex="1">
-          <mxGeometry height="1270" width="920" x="170" y="810" as="geometry">
+          <mxGeometry height="1350" width="920" x="190" y="1210" as="geometry">
             <mxRectangle height="40" width="50" x="130" y="-310" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -331,8 +347,20 @@
             <mxPoint x="300" y="850" as="targetPoint" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="ZkR9ZcXwZnaupmHbknSt-8" parent="Reka6r6GEI1tk0mXe-2V-121" style="whiteSpace=wrap;html=1;strokeColor=light-dark(#000000,#FF0000);" value="&lt;div&gt;type: terminationBroadcast&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;This should never happen&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="347.5" y="1260" as="geometry" />
+        </mxCell>
+        <mxCell id="ZkR9ZcXwZnaupmHbknSt-9" edge="1" parent="Reka6r6GEI1tk0mXe-2V-121" source="Reka6r6GEI1tk0mXe-2V-127" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.307;exitY=1.004;exitDx=0;exitDy=0;exitPerimeter=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="187" y="1290" />
+            </Array>
+            <mxPoint x="199.5" y="720" as="sourcePoint" />
+            <mxPoint x="347.5" y="1290" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-161" parent="1" style="swimlane;startSize=0;strokeColor=light-dark(#000000,#FFFFFF);" value="" vertex="1">
-          <mxGeometry height="1460" width="1070" x="1580" y="-790" as="geometry">
+          <mxGeometry height="1580" width="1070" x="1570" y="-580" as="geometry">
             <mxRectangle height="40" width="50" x="130" y="-310" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -435,11 +463,11 @@
             <mxPoint x="605" y="360" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="Reka6r6GEI1tk0mXe-2V-186" parent="Reka6r6GEI1tk0mXe-2V-161" style="whiteSpace=wrap;html=1;" value="check if my smallest edge is smaller adjust if necessary, then pass message on to parent, add to callback&lt;br&gt;should never recieve from parent" vertex="1">
-          <mxGeometry height="75" width="235" x="545" y="392.5" as="geometry" />
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-186" parent="Reka6r6GEI1tk0mXe-2V-161" style="whiteSpace=wrap;html=1;" value="check if my smallest edge is smaller adjust if necessary,&lt;div&gt;then pass message on to parent, add self to callback&lt;br&gt;should never recieve from parent&lt;/div&gt;" vertex="1">
+          <mxGeometry height="97.5" width="275" x="545" y="381.25" as="geometry" />
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-187" parent="Reka6r6GEI1tk0mXe-2V-161" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" value="&lt;div&gt;type: &quot;smallestFringeEdgeFound&quot;&lt;/div&gt;&lt;div&gt;level, city, callback&lt;/div&gt;" vertex="1">
-          <mxGeometry height="80" width="210" x="545" y="290" as="geometry" />
+          <mxGeometry height="80" width="210" x="577.5" y="290" as="geometry" />
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-188" edge="1" parent="Reka6r6GEI1tk0mXe-2V-161" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="Reka6r6GEI1tk0mXe-2V-189" value="">
           <mxGeometry relative="1" as="geometry">
@@ -524,8 +552,25 @@
             <mxPoint x="760" y="230" as="targetPoint" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="ZkR9ZcXwZnaupmHbknSt-4" edge="1" parent="Reka6r6GEI1tk0mXe-2V-161" source="Reka6r6GEI1tk0mXe-2V-167" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.271;exitY=0.927;exitDx=0;exitDy=0;exitPerimeter=0;" target="ZkR9ZcXwZnaupmHbknSt-5" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="102" y="1510" />
+            </Array>
+            <mxPoint x="122.57" y="900" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZkR9ZcXwZnaupmHbknSt-7" edge="1" parent="Reka6r6GEI1tk0mXe-2V-161" source="ZkR9ZcXwZnaupmHbknSt-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ZkR9ZcXwZnaupmHbknSt-6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZkR9ZcXwZnaupmHbknSt-5" parent="Reka6r6GEI1tk0mXe-2V-161" style="whiteSpace=wrap;html=1;" value="&lt;div&gt;type: terminationBoradcast&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;city&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="270.07" y="1480" as="geometry" />
+        </mxCell>
+        <mxCell id="ZkR9ZcXwZnaupmHbknSt-6" parent="Reka6r6GEI1tk0mXe-2V-161" style="whiteSpace=wrap;html=1;" value="Become done&lt;br&gt;knowing that city is leader&lt;div&gt;pass message to children&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="219.93" x="470.07" y="1480" as="geometry" />
+        </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-257" parent="1" style="swimlane;startSize=0;" value="" vertex="1">
-          <mxGeometry height="740" width="790" x="1550" y="820" as="geometry">
+          <mxGeometry height="740" width="790" x="1520" y="1210" as="geometry">
             <mxRectangle height="40" width="50" x="130" y="-310" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
