@@ -76,6 +76,7 @@ func writeDOT(nodes map[int]Node, filename string) error {
 				continue
 			}
 			seen[v.id] = true
+			//fmt.Println(v.id, v.node1.name, v.node2.name)
 
 			fmt.Fprintf(
 				f,

@@ -41,8 +41,8 @@ func generateRandomGraph(nodesNum int, connectionsNum int, initiatorNum int, nod
 		for n2 == n1 || nodes[n1].neighbors[n2] == 1 || nodes[n2].neighbors[n1] == 1 {
 			n2 = rand.IntN(nodesNum)
 		}
-		fmt.Println(n1, ",", n2)
-		fmt.Println(nodes[n1].neighbors[n2])
+		//fmt.Println(n1, ",", n2)
+		//fmt.Println(nodes[n1].neighbors[n2])
 		connect(i, n1, n2, nodes)
 		i++
 	}
@@ -64,32 +64,33 @@ func fileSetup(filePath string, withWeight bool, initiatorNum int, nodes map[int
 			panic("invalid file format")
 		}
 		if i != 0 {
-			fmt.Println(line)
+			//fmt.Println("line:", line)
 			n1, err := strconv.Atoi(line[0])
 			check(err)
 
 			if _, ok := nodes[n1]; !ok {
-				fmt.Println("not ok", n1)
+				//fmt.Println("not ok", n1)
 				initiator := false
 				if len(nodes) < initiatorNum {
 					initiator = true
 				}
-				nodes[n1] = NewNode(i, initiator)
+				nodes[n1] = NewNode(n1, initiator)
 			}
 			n2, err := strconv.Atoi(line[1])
 			check(err)
 			if _, ok := nodes[n2]; !ok {
-				fmt.Println("not ok", n2)
+				//fmt.Println("not ok", n2)
 				initiator := false
 				if len(nodes) < initiatorNum {
 					initiator = true
 				}
-				nodes[n2] = NewNode(i, initiator)
+				nodes[n2] = NewNode(n2, initiator)
 			}
 			connect(i, n1, n2, nodes)
 		}
 		i++
 	}
+	remakeNodeNeighbors(nodes)
 }
 
 func connect(i int, n1 int, n2 int, nodes map[int]Node) {
@@ -103,7 +104,7 @@ func connect(i int, n1 int, n2 int, nodes map[int]Node) {
 	node2.edges[i] = v
 	node2.neighbors[node1.name] = 1
 	nodes[n2] = node2
-	fmt.Println(node1.edges)
+	//fmt.Println(n1, n2, node1.edges)
 }
 
 func check(e error) {
