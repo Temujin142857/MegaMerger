@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 func instructions(node *Node, complexity *int) {
 	if node.initiator {
@@ -17,11 +20,8 @@ func instructions(node *Node, complexity *int) {
 		case "Village":
 			villageInstructions(node, &message, complexity)
 		case "Asleep":
-			downTownInstructions(node, &message, complexity)
-		case "Done":
-			downTownInstructions(node, &message, complexity)
+			asleepInstructions(node, &message, complexity)
 		}
-
 		if node.state == "done" {
 			break
 		}
@@ -29,23 +29,29 @@ func instructions(node *Node, complexity *int) {
 	fmt.Println("done")
 }
 
-func findSmallestExternalEdge(node *Node) int { return 0 }
-
 // target is the index of the edge in node.edges
 func sendMessage(node *Node, target int, message *Message, complexity *int) {
 	*complexity++
+	message.sender = target
 
 }
 
-func broadcast(node *Node, message Message, compexity *int) {
+func broadcast(node *Node, message *Message, complexity *int) {
 
+}
+
+func sendUpSmallestFringeEdgeFound(node *Node, complexity *int) {
+	sendMessage(node, node.parent, &node.smallestExternalEdgeFound, complexity)
+	node.fringeEdgeFoundResponceCount = 0
+	node.foundMySmallestExternalEdge = false
+	node.smallestExternalEdgeFound = Message{catagory: "smallestFringeEdgeFound", payload: math.MaxInt}
 }
 
 func queryNonChildren(node *Node, message Message, compexity *int) {
-	for i := 0; i < len(node.neighbors); i++ {
-		if _, ok := node.internalNeighbors[i]; !ok {
-			outMessage := Message{catagory: "cityCheck", sender: node.internalNeighbors[i], level: node.level, city: node.city}
-			sendMessage(node, node.internalNeighbors[i], &outMessage, compexity)
+	for k, v := range node.neighbors {
+		if v == 0 {
+			outMessage := Message{catagory: "cityCheck", level: node.level, city: node.city}
+			sendMessage(node, k, &outMessage, compexity)
 			return
 		}
 	}
@@ -57,81 +63,151 @@ func start(node *Node) {
 
 }
 
+func asleepInstructions(node *Node, message *Message, complexity *int) {
+	switch message.catagory {
+	case "findSmallestFringeEdge":
+		panic("Asleep node recieve findSmallestFringeEdge")
+
+	case "smallestFringeEdgeFound":
+		panic("Asleep node recieve smallestFringeEdgeFound")
+
+	case "mergeRequest":
+		outMessage := Message{catagory: "getAbsorbed", level: node.level, city: node.city, destinationPath: message.callbackPath}
+		if node.level > message.level {
+			sendMessage(node, outMessage.destinationPath.Pop(), &outMessage, complexity)
+			node.neighbors[message.sender] = 2
+			node.chidlrenCount++
+		} else {
+			node.substate = "WaitingToReply"
+			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level})
+		}
+
+	case "mergeAccepted":
+		panic("Asleep node recieved mergeAccespted")
+
+	case "getAbsorbed":
+		panic("Asleep node recieve getAbsorbed")
+
+	case "cityCheck":
+		node.state = "Downtown"
+		node.city = node.name
+		node.level = 1
+		outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "external"}
+		sendMessage(node, message.sender, &outMessage, complexity)
+
+	case "cityCheckReply":
+		panic("Asleep node recieved cityCheckReply")
+
+	case "terminationBroadcast":
+		broadcast(node, message, complexity)
+		node.state = "Done"
+	}
+}
+
 func villageInstructions(node *Node, message *Message, complexity *int) {
 	switch message.catagory {
 	case "findSmallestFringeEdge":
-		callback := edgePath{edges: append(message.callbackPath.edges, message.sender)}
-		outMessage := Message{catagory: "findSmallestFringeEdge", sender: message.sender, level: node.level, city: node.city, callbackPath: callback}
-		broadcast(node, outMessage, complexity)
-		outMessage2 := Message{catagory: "cityCheck", sender: message.sender, level: node.level, city: node.city, callbackPath: callback}
+		if len(node.neighbors) == 1 {
+			outMessage := Message{catagory: "smallestFringeEdgeFound", level: node.level, city: node.city, payload: math.MaxInt}
+			sendMessage(node, node.parent, &outMessage, complexity)
+		}
+		if len(node.neighbors)-node.chidlrenCount == 1 {
+			node.foundMySmallestExternalEdge = true
+		}
+		callback := EdgePath{edges: append(message.callbackPath.edges, message.sender)}
+		outMessage := Message{catagory: "findSmallestFringeEdge", level: node.level, city: node.city, callbackPath: callback}
+		broadcast(node, &outMessage, complexity)
+		outMessage2 := Message{catagory: "cityCheck", level: node.level, city: node.city, callbackPath: callback}
 		queryNonChildren(node, outMessage2, complexity)
 
 	case "smallestFringeEdgeFound":
 		if message.sender == node.parent {
 			panic("village recieved smallest fringe edge from parent")
 		}
-		if message.payload > node.mySmallestInternalEdge {
-			message.payload = node.mySmallestInternalEdge
-			message.callbackPath = edgePath{edges: []int{node.parent}}
-		} else {
-			message.callbackPath.edges = append(message.callbackPath.edges, node.parent)
+		node.fringeEdgeFoundResponceCount++
+		if message.payload < node.smallestExternalEdgeFound.payload {
+			node.smallestExternalEdgeFound = *message
+			node.smallestExternalEdgeFound.callbackPath.edges = append(node.smallestExternalEdgeFound.callbackPath.edges, message.sender)
 		}
-		sendMessage(node, node.parent, message, complexity)
+		if node.fringeEdgeFoundResponceCount == node.chidlrenCount && node.foundMySmallestExternalEdge {
+			sendUpSmallestFringeEdgeFound(node, complexity)
+		}
 
 	case "mergeRequest":
-		outMessage := Message{catagory: "getAbsorbed", sender: message.sender, level: node.level, city: node.city, destinationPath: message.callbackPath}
+		outMessage := Message{catagory: "getAbsorbed", level: node.level, city: node.city, destinationPath: message.callbackPath}
 		if node.level > message.level {
 			sendMessage(node, outMessage.destinationPath.Pop(), &outMessage, complexity)
-			node.children = append(node.children, message.sender)
-			node.internalNeighbors[message.sender] = 2
+			node.neighbors[message.sender] = 2
+			node.chidlrenCount++
 		} else {
-			node.substate = "waitingToReply"
-
+			node.substate = "WaitingToReply"
+			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level})
 		}
-		//note consider if if b and c both make a merge request to me
-		//use array to store pending request
-		//just need to store level, and sender
 
 	case "mergeAccepted":
-		outMessage := Message{catagory: "mergeAccepted", sender: message.sender, level: message.level, city: message.city}
-		broadcast(node, outMessage, complexity)
-		if message.city != node.city {
-			node.city = message.city
-			node.level = message.level
-			node.state = "Village"
-			node.parent = message.callbackPath.Peek()
-			node.removeChild(message.callbackPath.Peek())
+		node.level = message.level
+		node.city = message.city
+		if message.sender == node.parent {
+			broadcast(node, message, complexity)
+		} else if node.neighbors[message.sender] == 2 {
+			outMessage := Message{catagory: "mergeAccepted", level: node.level, city: node.city}
+			sendMessage(node, node.parent, &outMessage, complexity)
+			node.neighbors[node.parent] = 2
+			node.parent = message.sender
+			node.neighbors[message.sender] = 3
+		} else if node.neighbors[message.sender] == 1 {
+			panic("village recieved merge accepted from internal non child/parent node")
+		} else {
+			//case where it's establishing a friendly merger with the neighbor
 		}
 
 	case "getAbsorbed":
 		if message.level <= node.level {
-			panic("downtown recieved asborb message with smaller level")
+			panic("village recieved asborb message with smaller level")
 		}
-		outMessage := Message{catagory: "getAbsorbed", sender: message.sender, level: message.level, city: message.city}
-		broadcast(node, outMessage, complexity)
 		node.city = message.city
 		node.level = message.level
-		node.state = "Village"
-		node.parent = message.callbackPath.Peek()
-		node.removeChild(message.callbackPath.Peek())
+		outMessage := Message{catagory: "getAbsorbed", level: message.level, city: message.city}
+		if message.sender == node.parent {
+			broadcast(node, &outMessage, complexity)
+		} else if node.neighbors[message.sender] == 1 {
+			panic("village recieved merge accepted from internal non child/parent node")
+		} else {
+			//case where it's coming from external neighbor or child
+			sendMessage(node, node.parent, &outMessage, complexity)
+			node.neighbors[node.parent] = 2
+			node.parent = message.sender
+			node.neighbors[message.sender] = 3
+		}
 
 	case "cityCheck":
 		if message.city == node.city {
-			outMessage := Message{catagory: "cityCheckReply", sender: message.sender, level: node.level, city: node.city, answer: "internal"}
+			outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "internal"}
 			sendMessage(node, outMessage.destinationPath.Pop(), &outMessage, complexity)
 		} else if node.level >= message.level {
-			outMessage := Message{catagory: "cityCheckReply", sender: message.sender, level: node.level, city: node.city, answer: "external"}
+			outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "external"}
 			sendMessage(node, outMessage.destinationPath.Pop(), &outMessage, complexity)
 		} else {
 			node.substate = "WatingToReply"
+			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level})
 		}
 
 	case "cityCheckReply":
-		//need to write
+		if message.answer == "internal" {
+			node.neighbors[message.sender] = 1
+		} else {
+			node.foundMySmallestExternalEdge = true
+			if message.sender > node.smallestExternalEdgeFound.payload {
+				node.smallestExternalEdgeFound = Message{catagory: "smallestFringeEdgeFound", city: node.city, level: node.level, callbackPath: EdgePath{edges: []int{message.sender}}}
+			}
+			if node.fringeEdgeFoundResponceCount == node.chidlrenCount {
+				sendUpSmallestFringeEdgeFound(node, complexity)
+			}
+		}
 
 	case "terminationBroadcast":
-		panic("downtown recieved termination broadcast")
-
+		broadcast(node, message, complexity)
+		node.state = "Done"
 	}
 }
 
@@ -141,52 +217,63 @@ func downTownInstructions(node *Node, message *Message, complexity *int) {
 		panic("Downtown recieved find smallest fringe edge")
 
 	case "smallestFringeEdgeFound":
-		callback := edgePath{edges: []int{message.callbackPath.Peek()}}
-		outMessage := Message{catagory: "mergeRequest", sender: message.sender, level: node.level, city: node.city, callbackPath: callback, destinationPath: message.callbackPath}
+		callback := EdgePath{edges: []int{message.callbackPath.Peek()}}
+		outMessage := Message{catagory: "mergeRequest", level: node.level, city: node.city, callbackPath: callback, destinationPath: message.callbackPath}
 		sendMessage(node, outMessage.destinationPath.Pop(), &outMessage, complexity)
 
 	case "mergeRequest":
-		outMessage := Message{catagory: "getAbsorbed", sender: message.sender, level: node.level, city: node.city, destinationPath: message.callbackPath}
+		outMessage := Message{catagory: "getAbsorbed", level: node.level, city: node.city, destinationPath: message.callbackPath}
 		if node.level > message.level {
 			sendMessage(node, outMessage.destinationPath.Pop(), &outMessage, complexity)
-			node.children = append(node.children, message.sender)
-			node.internalNeighbors[message.sender] = 2
+			node.neighbors[message.sender] = 2
+			node.chidlrenCount++
 		} else {
-			node.substate = "waitingToReply"
+			node.substate = "WaitingToReply"
+			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level})
 		}
 
 	case "mergeAccepted":
-		outMessage := Message{catagory: "mergeAccepted", sender: message.sender, level: message.level, city: message.city}
-		broadcast(node, outMessage, complexity)
+		//need to andle the frienfly merger case
+		outMessage := Message{catagory: "mergeAccepted", level: message.level, city: message.city}
 		if message.city != node.city {
 			node.city = message.city
 			node.level = message.level
 			node.state = "Village"
-			node.parent = message.callbackPath.Peek()
-			node.removeChild(message.callbackPath.Peek())
+			if node.neighbors[message.sender] == 2 {
+				node.chidlrenCount--
+			}
+			node.parent = message.sender
+			node.neighbors[message.sender] = 3
 		}
+		broadcast(node, &outMessage, complexity)
 
 	case "getAbsorbed":
 		if message.level <= node.level {
 			panic("downtown recieved asborb message with smaller level")
+		} else if node.neighbors[message.sender] == 1 {
+			panic("downtown recieved asborb message from non child neighbor")
 		}
-		outMessage := Message{catagory: "getAbsorbed", sender: message.sender, level: message.level, city: message.city}
-		broadcast(node, outMessage, complexity)
+		outMessage := Message{catagory: "getAbsorbed", level: message.level, city: message.city}
+		broadcast(node, &outMessage, complexity)
 		node.city = message.city
 		node.level = message.level
 		node.state = "Village"
-		node.parent = message.callbackPath.Peek()
-		node.removeChild(message.callbackPath.Peek())
+		if node.neighbors[message.sender] == 2 {
+			node.chidlrenCount--
+		}
+		node.parent = message.sender
+		node.neighbors[message.sender] = 3
 
 	case "cityCheck":
 		if message.city == node.city {
-			outMessage := Message{catagory: "cityCheckReply", sender: message.sender, level: node.level, city: node.city, answer: "internal"}
+			outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "internal"}
 			sendMessage(node, outMessage.destinationPath.Pop(), &outMessage, complexity)
 		} else if node.level >= message.level {
-			outMessage := Message{catagory: "cityCheckReply", sender: message.sender, level: node.level, city: node.city, answer: "external"}
+			outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "external"}
 			sendMessage(node, outMessage.destinationPath.Pop(), &outMessage, complexity)
 		} else {
 			node.substate = "WatingToReply"
+			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level})
 		}
 
 	case "cityCheckReply":

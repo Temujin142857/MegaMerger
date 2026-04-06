@@ -4,7 +4,7 @@ var STATES = [...]string{"DOWNTOWN", "ASLEEP", "VILLAGE", "DONE"}
 var MESSAGE_CATEGORIES = [...]string{"FIND_SMALLEST_FRINGE_EDGE", "SMALLEST_FRINGE_EDGE_FOUND", "MERE_REQUEST", "MERGE_REQUESTED", "GET_ABSORBED", "WE_ABSORBED_THEM", "CITY_CHECK"}
 var SUB_STATES = [...]string{"WAITING_TO_REPLY"}
 
-type edgePath struct {
+type EdgePath struct {
 	edges []int
 }
 
@@ -13,10 +13,15 @@ type Message struct {
 	sender          int
 	level           int
 	city            int
-	callbackPath    edgePath
-	destinationPath edgePath
+	callbackPath    EdgePath
+	destinationPath EdgePath
 	answer          string
 	payload         int
+}
+
+type PendingMergeRequest struct {
+	sender int
+	level  int
 }
 
 // parent and children are indexes for the edges array
@@ -25,31 +30,32 @@ type Node struct {
 	level int
 	city  int
 	//parent and children should be edge indixes
-	parent   int
-	children []int
-	edges    []Vertex
-	//only used in setup
-	neighbors map[int]int
-	//maps vertex to a 1 if internal, 2 if a child
-	internalNeighbors      map[int]int
-	mySmallestInternalEdge int
-	state                  string
-	substate               string
-	initiator              bool
-	inbox                  chan Message
+	parent int
+	edges  map[int]Vertex
+	//has different meaning in setup, but after gets converted to map edge id->0 if unkonwn, 1 if internal, 2 if a child, 3 if parent
+	neighbors                    map[int]int
+	chidlrenCount                int
+	foundMySmallestExternalEdge  bool
+	smallestExternalEdgeFound    Message
+	state                        string
+	substate                     string
+	pendingMergeRequests         []PendingMergeRequest
+	fringeEdgeFoundResponceCount int
+	initiator                    bool
+	inbox                        chan Message
 }
 
 type Vertex struct {
-	name  int
+	id    int
 	node1 *Node
 	node2 *Node
 }
 
-func (s *edgePath) Push(item int) {
+func (s *EdgePath) Push(item int) {
 	s.edges = append(s.edges, item)
 }
 
-func (s *edgePath) Pop() int {
+func (s *EdgePath) Pop() int {
 	if len(s.edges) == 0 {
 		return -1
 	}
@@ -58,7 +64,7 @@ func (s *edgePath) Pop() int {
 	return item
 }
 
-func (s *edgePath) Peek() int {
+func (s *EdgePath) Peek() int {
 	if len(s.edges) == 0 {
 		return -1
 	}
@@ -66,15 +72,6 @@ func (s *edgePath) Peek() int {
 	return item
 }
 
-func (s *edgePath) IsEmpty() bool {
+func (s *EdgePath) IsEmpty() bool {
 	return len(s.edges) == 0
-}
-
-func (n *Node) removeChild(target int) {
-	for i, v := range n.children {
-		if v == target {
-			n.children = append(n.children[:i], n.children[i+1:]...)
-			return
-		}
-	}
 }

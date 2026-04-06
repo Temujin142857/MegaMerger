@@ -46,6 +46,9 @@ func generateRandomGraph(nodesNum int, connectionsNum int, initiatorNum int, nod
 		connect(i, n1, n2, nodes)
 		i++
 	}
+
+	remakeNodeNeighbors(nodes)
+
 }
 
 func fileSetup(filePath string, withWeight bool, initiatorNum int, nodes map[int]Node) {
@@ -92,12 +95,12 @@ func fileSetup(filePath string, withWeight bool, initiatorNum int, nodes map[int
 func connect(i int, n1 int, n2 int, nodes map[int]Node) {
 	node1 := nodes[n1]
 	node2 := nodes[n2]
-	v := Vertex{name: i, node1: &node1, node2: &node2}
-	node1.edges = append(node1.edges, v)
+	v := Vertex{id: i, node1: &node1, node2: &node2}
+	node1.edges[i] = v
 	node1.neighbors[node2.name] = 1
 	nodes[n1] = node1
 
-	node2.edges = append(node2.edges, v)
+	node2.edges[i] = v
 	node2.neighbors[node1.name] = 1
 	nodes[n2] = node2
 	fmt.Println(node1.edges)
@@ -106,5 +109,15 @@ func connect(i int, n1 int, n2 int, nodes map[int]Node) {
 func check(e error) {
 	if e != nil {
 		panic(e)
+	}
+}
+
+func remakeNodeNeighbors(nodes map[int]Node) {
+	for k, v := range nodes {
+		v.neighbors = make(map[int]int)
+		for ek, ev := range v.edges {
+			v.neighbors[ek] = 0
+		}
+		nodes[k] = v
 	}
 }
