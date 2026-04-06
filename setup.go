@@ -15,7 +15,7 @@ func generateRandomGraph(nodesNum int, connectionsNum int, initiatorNum int, nod
 		if i < initiatorNum {
 			initiator = true
 		}
-		nodes[i] = Node{name: i, level: 0, city: -1, parent: -1, state: "asleep", initiator: initiator, neighbors: make(map[int]int)}
+		nodes[i] = NewNode(i, initiator)
 	}
 	//first give each node an edge, so they are not isolated
 	i := 0
@@ -74,7 +74,7 @@ func fileSetup(filePath string, withWeight bool, initiatorNum int, nodes map[int
 				if len(nodes) < initiatorNum {
 					initiator = true
 				}
-				nodes[n1] = Node{name: n1, level: 0, city: -1, parent: -1, state: "asleep", initiator: initiator, neighbors: make(map[int]int)}
+				nodes[n1] = NewNode(i, initiator)
 			}
 			n2, err := strconv.Atoi(line[1])
 			check(err)
@@ -84,7 +84,7 @@ func fileSetup(filePath string, withWeight bool, initiatorNum int, nodes map[int
 				if len(nodes) < initiatorNum {
 					initiator = true
 				}
-				nodes[n2] = Node{name: n2, level: 0, city: -1, parent: -1, state: "asleep", initiator: initiator, neighbors: make(map[int]int)}
+				nodes[n2] = NewNode(i, initiator)
 			}
 			connect(i, n1, n2, nodes)
 		}

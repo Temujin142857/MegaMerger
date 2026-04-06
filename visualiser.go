@@ -72,17 +72,17 @@ func writeDOT(nodes map[int]Node, filename string) error {
 	for _, n := range nodes {
 		for _, v := range n.edges {
 
-			if seen[v.name] {
+			if seen[v.id] {
 				continue
 			}
-			seen[v.name] = true
+			seen[v.id] = true
 
 			fmt.Fprintf(
 				f,
 				"  %d -- %d [label=\"v%d\"];\n",
 				v.node1.name,
 				v.node2.name,
-				v.name,
+				v.id,
 			)
 		}
 	}

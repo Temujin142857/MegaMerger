@@ -45,6 +45,12 @@ type Node struct {
 	inbox                        chan Message
 }
 
+func NewNode(id int, initiatior bool) Node {
+	n := Node{name: id, level: 1, city: id, edges: make(map[int]Vertex), neighbors: make(map[int]int), chidlrenCount: 0,
+		foundMySmallestExternalEdge: false, state: "Asleep", substate: "", fringeEdgeFoundResponceCount: 0, initiator: initiatior}
+	return n
+}
+
 type Vertex struct {
 	id    int
 	node1 *Node

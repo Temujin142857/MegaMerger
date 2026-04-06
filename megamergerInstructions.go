@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-func instructions(node *Node, complexity *int) {
+func instructions(node *Node, complexity *int, leader *int) {
 	if node.initiator {
 		start(node, complexity)
 	}
@@ -25,7 +25,7 @@ func instructions(node *Node, complexity *int) {
 			break
 		}
 	}
-	fmt.Println("done")
+	fmt.Println("done, leader=", node.city)
 }
 
 // target is the index of the edge in node.edges

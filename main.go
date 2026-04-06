@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"math"
 	"sync"
+
 	//"gg"
+	"runtime/debug"
 )
 
 var (
@@ -25,7 +27,8 @@ func init() {
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("Error:\n", r)
+			fmt.Println("Error:", r)
+			debug.PrintStack()
 		}
 	}()
 
@@ -48,8 +51,12 @@ func runFromFile() {
 	//note here nodenum is the amount of initiators
 	fileSetup(filePath, withWeight, nodeNum, nodes)
 	VisualizeGraph(nodes, "network")
-	//complexity := 0
-	//runAlgorithm(nodes, &complexity)
+	complexity := 0
+	leader := -1
+	//runAlgorithm(nodes, &complexity, &leader)
+	fmt.Printf("algorithm terminated\n")
+	fmt.Printf("leader: %d\n", leader)
+	fmt.Printf("complexity: %d\n", complexity)
 }
 
 func procedure1(n int) [4]int {
@@ -72,7 +79,8 @@ func procedure1(n int) [4]int {
 			//note we currently make every node an initiator
 			generateRandomGraph(n, m, n, nodes)
 			complexity := 0
-			runAlgorithm(nodes, &complexity)
+			leader := -1
+			runAlgorithm(nodes, &complexity, &leader)
 			totalComplexity += complexity
 		}
 		averageComplexities[i] = totalComplexity / 1000
@@ -96,7 +104,8 @@ func procedure2() [4]int {
 			//note we currently make every node an initiator
 			generateRandomGraph(n, m, n, nodes)
 			complexity := 0
-			runAlgorithm(nodes, &complexity)
+			leader := -1
+			runAlgorithm(nodes, &complexity, &leader)
 			totalComplexity += complexity
 		}
 		averageComplexities[i] = totalComplexity / 1000
@@ -104,13 +113,12 @@ func procedure2() [4]int {
 	return averageComplexities
 }
 
-func runAlgorithm(nodes map[int]Node, complexity *int) {
+func runAlgorithm(nodes map[int]Node, complexity *int, leader *int) {
+	//VisualizeGraph(nodes, "network")
 	var wg sync.WaitGroup
 	for _, node := range nodes {
-		wg.Go(func() { instructions(&node, complexity) })
+		wg.Go(func() { instructions(&node, complexity, leader) })
 	}
 
 	wg.Wait()
-
-	VisualizeGraph(nodes, "network")
 }
