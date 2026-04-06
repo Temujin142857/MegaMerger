@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 OPR/128.0.0.0">
   <diagram name="Page-1" id="IRjHNXaowiygX4C5sSkh">
-    <mxGraphModel dx="1474" dy="1478" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2222" dy="1929" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -141,6 +141,9 @@
         <mxCell id="Reka6r6GEI1tk0mXe-2V-58" parent="Reka6r6GEI1tk0mXe-2V-40" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" value="&lt;div&gt;type: mergeAccapted&lt;/div&gt;&lt;div&gt;new city, new level, no callback&lt;/div&gt;" vertex="1">
           <mxGeometry height="60" width="190" x="842.5400000000001" y="470" as="geometry" />
         </mxCell>
+        <mxCell id="_moUuIFwRGonJVV3YUXO-8" edge="1" parent="Reka6r6GEI1tk0mXe-2V-40" source="Reka6r6GEI1tk0mXe-2V-60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;endArrow=none;endFill=0;" target="Reka6r6GEI1tk0mXe-2V-55" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-60" parent="Reka6r6GEI1tk0mXe-2V-40" style="whiteSpace=wrap;html=1;" value="if(incoming city = city,&amp;nbsp;reply with answer=internal&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;else if (level&amp;gt;=incoming level) reply with answer=external&lt;/span&gt;&lt;div&gt;else{&lt;br&gt;set subState=WaitingToReply&lt;br&gt;wait for level change, or to be told to send friendly merge}&lt;/div&gt;&lt;/div&gt;" vertex="1">
           <mxGeometry height="90" width="348.75" x="805" y="910" as="geometry" />
         </mxCell>
@@ -224,6 +227,25 @@
         </mxCell>
         <mxCell id="ZkR9ZcXwZnaupmHbknSt-3" parent="Reka6r6GEI1tk0mXe-2V-40" style="whiteSpace=wrap;html=1;strokeColor=light-dark(#000000,#FF0000);" value="&lt;div&gt;type: terminationBroadcast&lt;/div&gt;&lt;div&gt;city&lt;/div&gt;&lt;div&gt;Should never recieve&lt;/div&gt;" vertex="1">
           <mxGeometry height="60" width="170" x="580" y="1170" as="geometry" />
+        </mxCell>
+        <mxCell id="_moUuIFwRGonJVV3YUXO-7" parent="Reka6r6GEI1tk0mXe-2V-40" style="whiteSpace=wrap;html=1;" value="if(answer== internal) add sender to internal neighbors&lt;br&gt;else save sender as closest external neighbor" vertex="1">
+          <mxGeometry height="95" width="353.75" x="805" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="_moUuIFwRGonJVV3YUXO-9" edge="1" parent="Reka6r6GEI1tk0mXe-2V-40" source="Reka6r6GEI1tk0mXe-2V-47" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="_moUuIFwRGonJVV3YUXO-10" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="1116" />
+            </Array>
+            <mxPoint x="490" y="790" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_moUuIFwRGonJVV3YUXO-10" parent="Reka6r6GEI1tk0mXe-2V-40" style="whiteSpace=wrap;html=1;" value="&lt;div&gt;type: cityCheck&lt;/div&gt;&lt;div&gt;city, level, callback&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="597.5" y="1086" as="geometry" />
+        </mxCell>
+        <mxCell id="_moUuIFwRGonJVV3YUXO-11" edge="1" parent="Reka6r6GEI1tk0mXe-2V-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;endArrow=none;endFill=0;" target="_moUuIFwRGonJVV3YUXO-10" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="805" y="1116" as="sourcePoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-121" parent="1" style="swimlane;startSize=0;" value="" vertex="1">
           <mxGeometry height="1350" width="920" x="190" y="1210" as="geometry">
@@ -347,7 +369,7 @@
           <mxGeometry height="60" width="120" x="330" y="1150" as="geometry" />
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-161" parent="1" style="swimlane;startSize=0;strokeColor=light-dark(#000000,#FFFFFF);" value="" vertex="1">
-          <mxGeometry height="1580" width="1082.4650000000001" x="1570" y="-580" as="geometry">
+          <mxGeometry height="1580" width="1260" x="1570" y="-580" as="geometry">
             <mxRectangle height="40" width="50" x="130" y="-310" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -393,17 +415,17 @@
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-170" edge="1" parent="Reka6r6GEI1tk0mXe-2V-161" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="Reka6r6GEI1tk0mXe-2V-172" value="">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="370.07000000000016" y="760" as="sourcePoint" />
+            <mxPoint x="351.39000000000016" y="801.25" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-171" edge="1" parent="Reka6r6GEI1tk0mXe-2V-161" source="Reka6r6GEI1tk0mXe-2V-172" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=none;endFill=0;" target="Reka6r6GEI1tk0mXe-2V-178" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-172" parent="Reka6r6GEI1tk0mXe-2V-161" style="whiteSpace=wrap;html=1;" value="update city and level&lt;br&gt;if from child pass to parent, then make the sender parent, and my parent a child&lt;div&gt;&amp;nbsp;if from parent pass to children&lt;/div&gt;" vertex="1">
-          <mxGeometry height="75" width="304.93" x="485.07" y="722.5" as="geometry" />
+          <mxGeometry height="75" width="304.93" x="466.39" y="763.75" as="geometry" />
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-173" parent="Reka6r6GEI1tk0mXe-2V-161" style="whiteSpace=wrap;html=1;" value="&lt;div&gt;type: mergeAccepted&lt;/div&gt;&lt;div&gt;city, level, no callback&lt;/div&gt;" vertex="1">
-          <mxGeometry height="60" width="120" x="270.07000000000005" y="730" as="geometry" />
+          <mxGeometry height="60" width="120" x="251.39000000000004" y="771.25" as="geometry" />
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-174" edge="1" parent="Reka6r6GEI1tk0mXe-2V-161" source="Reka6r6GEI1tk0mXe-2V-175" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="Reka6r6GEI1tk0mXe-2V-180" value="">
           <mxGeometry relative="1" as="geometry" />
@@ -418,7 +440,7 @@
           <mxGeometry height="80" width="220" x="240" y="170" as="geometry" />
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-178" parent="Reka6r6GEI1tk0mXe-2V-161" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" value="&lt;div&gt;type: mergeAccapted&lt;/div&gt;&lt;div&gt;new city, new level, no callback&lt;/div&gt;" vertex="1">
-          <mxGeometry height="60" width="190" x="542.5400000000002" y="640" as="geometry" />
+          <mxGeometry height="60" width="190" x="523.8600000000002" y="681.25" as="geometry" />
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-179" edge="1" parent="Reka6r6GEI1tk0mXe-2V-161" source="Reka6r6GEI1tk0mXe-2V-180" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;dashed=1;" target="Reka6r6GEI1tk0mXe-2V-181" value="">
           <mxGeometry relative="1" as="geometry" />
@@ -453,7 +475,7 @@
             <mxPoint x="605" y="360" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="Reka6r6GEI1tk0mXe-2V-186" parent="Reka6r6GEI1tk0mXe-2V-161" style="whiteSpace=wrap;html=1;" value="check if my smallest edge is smaller adjust if necessary,&lt;div&gt;then pass message on to parent, add self to callback&lt;br&gt;should never recieve from parent&lt;/div&gt;" vertex="1">
+        <mxCell id="Reka6r6GEI1tk0mXe-2V-186" parent="Reka6r6GEI1tk0mXe-2V-161" style="whiteSpace=wrap;html=1;" value=" " vertex="1">
           <mxGeometry height="97.5" width="275" x="545" y="381.25" as="geometry" />
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-187" parent="Reka6r6GEI1tk0mXe-2V-161" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" value="&lt;div&gt;type: &quot;smallestFringeEdgeFound&quot;&lt;/div&gt;&lt;div&gt;level, city, callback&lt;/div&gt;" vertex="1">
@@ -466,6 +488,11 @@
         </mxCell>
         <mxCell id="ZkR9ZcXwZnaupmHbknSt-17" edge="1" parent="Reka6r6GEI1tk0mXe-2V-161" source="Reka6r6GEI1tk0mXe-2V-189" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ZkR9ZcXwZnaupmHbknSt-16" value="">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_moUuIFwRGonJVV3YUXO-12" edge="1" parent="Reka6r6GEI1tk0mXe-2V-161" source="Reka6r6GEI1tk0mXe-2V-189" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="_moUuIFwRGonJVV3YUXO-13" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="620" y="633" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-189" parent="Reka6r6GEI1tk0mXe-2V-161" style="whiteSpace=wrap;html=1;" value="If self.level &amp;gt; level in message then send back getAbsorbed and make sender a child&lt;br&gt;else set state to waitingToReply" vertex="1">
           <mxGeometry height="70" width="301.25" x="470.07" y="515" as="geometry" />
@@ -565,6 +592,9 @@
             <mxPoint x="240" y="1369.91" as="targetPoint" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="_moUuIFwRGonJVV3YUXO-13" parent="Reka6r6GEI1tk0mXe-2V-161" style="rounded=0;whiteSpace=wrap;html=1;" value="Note if it has a payload it is on it&#39;s way down the tree, so just pass it on, realistically there should be a message type for it, but I&#39;m running short on time" vertex="1">
+          <mxGeometry height="60" width="360" x="440" y="605" as="geometry" />
+        </mxCell>
         <mxCell id="Reka6r6GEI1tk0mXe-2V-257" parent="1" style="swimlane;startSize=0;" value="" vertex="1">
           <mxGeometry height="740" width="1120" x="1520" y="1210" as="geometry">
             <mxRectangle height="40" width="50" x="130" y="-310" as="alternateBounds" />
@@ -617,7 +647,7 @@
           <mxGeometry height="210" width="120" x="-520" y="-70" as="geometry" />
         </mxCell>
         <mxCell id="KRngHQGL71caUblvc6vX-2" parent="1" style="swimlane;startSize=0;" value="" vertex="1">
-          <mxGeometry height="740" width="1200" x="1440" y="2050" as="geometry">
+          <mxGeometry height="740" width="1200" x="1490" y="2100" as="geometry">
             <mxRectangle height="40" width="50" x="130" y="-310" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
