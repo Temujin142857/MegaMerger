@@ -7,11 +7,10 @@ import (
 
 func instructions(node *Node, complexity *int) {
 	if node.initiator {
-		start(node)
+		start(node, complexity)
 	}
 
 	for true {
-
 		message := <-node.inbox
 
 		switch node.state {
@@ -33,7 +32,7 @@ func instructions(node *Node, complexity *int) {
 func sendMessage(node *Node, target int, message *Message, complexity *int) {
 	*complexity++
 	message.sender = target
-
+	node.edges[target].node2.inbox <- *message
 }
 
 func broadcast(node *Node, message *Message, complexity *int) {
@@ -57,10 +56,18 @@ func queryNonChildren(node *Node, message Message, compexity *int) {
 	}
 }
 
-func start(node *Node) {
+func start(node *Node, complexity *int) {
 	node.state = "Downtown"
-	//path := findSmallestExternalEdge(node)
-
+	node.city = node.name
+	node.level = 1
+	mink := math.MaxInt
+	for k, _ := range node.neighbors {
+		if k < mink {
+			mink = k
+		}
+	}
+	outMessage := Message{catagory: "mergeRequest", level: node.level, city: node.city}
+	sendMessage(node, mink, &outMessage, complexity)
 }
 
 func asleepInstructions(node *Node, message *Message, complexity *int) {

@@ -115,7 +115,7 @@ func check(e error) {
 func remakeNodeNeighbors(nodes map[int]Node) {
 	for k, v := range nodes {
 		v.neighbors = make(map[int]int)
-		for ek, ev := range v.edges {
+		for ek, _ := range v.edges {
 			v.neighbors[ek] = 0
 		}
 		nodes[k] = v
