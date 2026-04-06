@@ -25,6 +25,7 @@ func instructions(node *Node, complexity *int, leader *int) {
 			break
 		}
 	}
+	*leader = node.city
 	fmt.Println("done, leader=", node.city)
 }
 
@@ -32,6 +33,7 @@ func instructions(node *Node, complexity *int, leader *int) {
 func sendMessage(node *Node, target int, message *Message, complexity *int) {
 	*complexity++
 	message.sender = target
+	fmt.Println(node.name, message)
 	node.edges[target].node2.inbox <- *message
 }
 
@@ -57,9 +59,6 @@ func queryNonChildren(node *Node, message Message, compexity *int) {
 }
 
 func start(node *Node, complexity *int) {
-	node.state = "Downtown"
-	node.city = node.name
-	node.level = 1
 	mink := math.MaxInt
 	for k, _ := range node.neighbors {
 		if k < mink {

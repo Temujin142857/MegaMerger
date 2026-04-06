@@ -46,8 +46,12 @@ type Node struct {
 }
 
 func NewNode(id int, initiatior bool) Node {
+	state := "Asleep"
+	if initiatior {
+		state = "Downtown"
+	}
 	n := Node{name: id, level: 1, city: id, edges: make(map[int]Vertex), neighbors: make(map[int]int), chidlrenCount: 0,
-		foundMySmallestExternalEdge: false, state: "Asleep", substate: "", fringeEdgeFoundResponceCount: 0, initiator: initiatior}
+		foundMySmallestExternalEdge: false, state: state, substate: "", fringeEdgeFoundResponceCount: 0, initiator: initiatior}
 	return n
 }
 

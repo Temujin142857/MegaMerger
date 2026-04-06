@@ -53,7 +53,7 @@ func runFromFile() {
 	VisualizeGraph(nodes, "network")
 	complexity := 0
 	leader := -1
-	//runAlgorithm(nodes, &complexity, &leader)
+	runAlgorithm(nodes, &complexity, &leader)
 	fmt.Printf("algorithm terminated\n")
 	fmt.Printf("leader: %d\n", leader)
 	fmt.Printf("complexity: %d\n", complexity)
