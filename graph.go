@@ -11,20 +11,27 @@ type EdgePath struct {
 }
 
 type Message struct {
-	catagory        string
+	catagory string
+	//note this is the edge it came from, not a nodes id
 	sender          int
 	level           int
 	city            int
 	callbackPath    EdgePath
 	destinationPath EdgePath
-	answer          string
-	payload         int
-	payload2        int
+	//the next three are optional information, only used for some messages, in retrospect multiple types of message structs would be cleaner, might change if I have time
+	//answer will be internal or external
+	answer string
+	//payload is for smallestFringe edge found, it's the smallest edge found so far
+	payload int
+	//payload 2 is the id of the sender
+	payload2 int
 }
 
 type PendingMergeRequest struct {
-	sender int
-	level  int
+	sender   int
+	level    int
+	payload2 int
+	friendly bool
 }
 
 // parent and children are indexes for the edges array
@@ -36,13 +43,17 @@ type Node struct {
 	parent int
 	edges  map[int]Vertex
 	//has different meaning in setup, but after gets converted to map edge id->0 if unkonwn, 1 if internal, 2 if a child, 3 if parent
-	neighbors                    map[int]int
-	nodesIveRequested            map[int]int
-	chidlrenCount                int
-	foundMySmallestExternalEdge  bool
-	smallestExternalEdgeFound    Message
-	state                        string
-	substate                     string
+	neighbors                   map[int]int
+	nodesIveRequested           map[int]int
+	chidlrenCount               int
+	foundMySmallestExternalEdge bool
+	smallestExternalEdgeFound   Message
+	state                       string
+	waitingToReply              bool
+	waitingToFriendlyMerge      bool
+	waitingForReply             bool
+	searchingForFringEdge       bool
+	//requests that will be resolved via absorbtion or freindly merge later on
 	pendingMergeRequests         []PendingMergeRequest
 	fringeEdgeFoundResponceCount int
 	initiator                    bool

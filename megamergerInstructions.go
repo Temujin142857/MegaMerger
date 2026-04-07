@@ -11,9 +11,9 @@ func instructions(node *Node, complexity *int, leader *int) {
 	}
 
 	for true {
-		//fmt.Println("Node", node.name, "waiting...")
+		fmt.Println("Node", node.name, "waiting...")
 		message := <-node.inbox
-		//fmt.Println("Node", node.name, "received", message.catagory)
+		fmt.Println("Node", node.name, "received", message.catagory, "from v:", message.sender)
 
 		switch node.state {
 		case "Downtown":
@@ -81,36 +81,99 @@ func start(node *Node, complexity *int) {
 			mink = k
 		}
 	}
-	node.substate = "WaitingForReply"
+	node.waitingForReply = true
 	node.nodesIveRequested[mink] = 1
 	outMessage := Message{catagory: "mergeRequest", level: node.level, city: node.city, payload2: node.name}
 	sendMessage(node, mink, &outMessage, complexity)
 }
 
+func friendlyMergeVillage(node *Node, sender int, payload2 int, complexity *int) {
+	//friendly merge, since this is a request from the node I've already requests
+	oldParent := node.parent
+	node.neighbors[oldParent] = 2
+	node.chidlrenCount++
+	if node.name < payload2 {
+		node.state = "Downtown"
+		node.neighbors[sender] = 2
+		node.chidlrenCount++
+	} else {
+		node.parent = sender
+		node.neighbors[sender] = 3
+	}
+	node.city = sender
+	node.level++
+	outMessage := Message{catagory: "mergeAccepted", level: node.level, city: node.city}
+	sendMessage(node, oldParent, &outMessage, complexity)
+	node.waitingForReply = false
+	nodeHasChangedLevel(node, complexity)
+}
+
+func friendlyMergeDowntown(node *Node, sender int, payload2 int, complexity *int) {
+	fmt.Println("here me", node.name, "target", sender)
+	//here we broadcast first so only the old children recieve it, not the possible new children from the merge
+	node.city = sender
+	node.level++
+	outMessage := Message{catagory: "mergeAccepted", level: node.level, city: node.city}
+	broadcast(node, &outMessage, complexity)
+	if node.name < payload2 {
+		node.state = "Downtown"
+		node.neighbors[sender] = 2
+		node.chidlrenCount++
+	} else {
+		node.parent = sender
+		node.neighbors[sender] = 3
+		node.state = "Village"
+	}
+	nodeHasChangedLevel(node, complexity)
+	if node.state == "Downtown" {
+		outMessage2 := Message{catagory: "findSmallestFringeEdge", city: node.city, level: node.level, payload: math.MaxInt}
+		broadcast(node, &outMessage2, complexity)
+		queryNonChildren(node, complexity)
+	}
+}
+
 func nodeHasChangedLevel(node *Node, complexity *int) {
-	if node.substate == "WaitingToReply" {
+	if node.waitingToReply == true {
+		//loop through beinding absorbtions
 		for i := 0; i < len(node.pendingMergeRequests); i++ {
-			if node.pendingMergeRequests[i].level < node.level {
+			if node.pendingMergeRequests[i].friendly == false && node.pendingMergeRequests[i].level < node.level {
 				outMessage := Message{catagory: "getAbsorbed", level: node.level, city: node.city}
 				sendMessage(node, node.pendingMergeRequests[i].sender, &outMessage, complexity)
 				node.pendingMergeRequests = remove(node.pendingMergeRequests, i)
 				fmt.Println("levelc:", len(node.pendingMergeRequests), node.name)
+				if len(node.pendingMergeRequests) == 0 && len(node.pendingMergeRequests) == 0 {
+					node.waitingToReply = false
+					return
+				}
+				//since we're removing an element, we back up to get the new element in this spot
+				i--
+			} else if node.pendingMergeRequests[i].friendly == true && node.pendingMergeRequests[i].level == node.level {
+				if node.state == "Downtown" {
+					friendlyMergeDowntown(node, node.pendingMergeRequests[i].sender, node.pendingMergeRequests[i].payload2, complexity)
+				} else if node.state == "Village" {
+					friendlyMergeVillage(node, node.pendingMergeRequests[i].sender, node.pendingMergeRequests[i].payload2, complexity)
+				}
+				node.pendingMergeRequests = remove(node.pendingMergeRequests, i)
+				fmt.Println("levelc:", len(node.pendingMergeRequests), node.name)
 				if len(node.pendingMergeRequests) == 0 {
-					node.substate = ""
+					node.waitingToFriendlyMerge = false
+					if len(node.pendingMergeRequests) == 0 {
+						node.waitingToReply = false
+					}
 					return
 				}
 				//since we're removing an element, we back up to get the new element in this spot
 				i--
 			}
 		}
-		fmt.Println("exited")
 	}
 }
 
 func villageInstructions(node *Node, message *Message, complexity *int) {
 	switch message.catagory {
 	case "findSmallestFringeEdge":
-		fmt.Println("findsmallest edge", *node)
+		fmt.Println("find edge", node.name)
+		node.searchingForFringEdge = true
 		if len(node.neighbors) == 1 {
 			outMessage := Message{catagory: "smallestFringeEdgeFound", level: node.level, city: node.city, callbackPath: EdgePath{edges: []int{}}, payload: math.MaxInt}
 			sendMessage(node, node.parent, &outMessage, complexity)
@@ -137,44 +200,37 @@ func villageInstructions(node *Node, message *Message, complexity *int) {
 		fmt.Println("node recieved smallestFringeEdge", node.name, node.foundMySmallestExternalEdge, node.chidlrenCount, node.fringeEdgeFoundResponceCount)
 		if node.fringeEdgeFoundResponceCount == node.chidlrenCount && node.foundMySmallestExternalEdge {
 			sendUpSmallestFringeEdgeFound(node, complexity)
+			//no longer searching
+			node.searchingForFringEdge = false
 		}
 
 	case "mergeRequest":
 		if message.payload > 0 {
+			//case where the message needs to be passed on until it reaches the external node
 			target := message.destinationPath.Pop()
 			if message.payload == 1 {
-				node.substate = "WaitingForReply"
+				node.waitingForReply = true
 				node.nodesIveRequested[target] = 1
 			}
 			message.payload--
 			message.payload2 = node.name
 			sendMessage(node, target, message, complexity)
 		} else if node.level > message.level {
+			//case where this node absorbes the requester
 			outMessage := Message{catagory: "getAbsorbed", level: node.level, city: node.city}
 			sendMessage(node, message.sender, &outMessage, complexity)
+			if node.searchingForFringEdge == true {
+				outMessage2 := Message{catagory: "findSmallestFringeEdge", level: node.level, city: node.city, payload: math.MaxInt, callbackPath: EdgePath{edges: []int{}}}
+				sendMessage(node, message.sender, &outMessage2, complexity)
+			}
 			node.neighbors[message.sender] = 2
 			node.chidlrenCount++
-		} else if node.substate == "WaitingForReply" && node.nodesIveRequested[message.sender] == 1 {
-			//friendly merge, since this is a request from the node I've already requests
-			oldParent := node.parent
-			node.neighbors[oldParent] = 2
-			node.chidlrenCount++
-			if node.name < message.payload2 {
-				node.state = "Downtown"
-				node.neighbors[message.sender] = 2
-				node.chidlrenCount++
-			} else {
-				node.parent = message.sender
-				node.neighbors[message.sender] = 3
-			}
-			node.city = message.sender
-			node.level++
-			outMessage := Message{catagory: "mergeAccepted", level: node.level, city: node.city}
-			sendMessage(node, oldParent, &outMessage, complexity)
-			nodeHasChangedLevel(node, complexity)
+		} else if node.waitingForReply == true && node.nodesIveRequested[message.sender] == 1 && node.level == message.level {
+			friendlyMergeVillage(node, message.sender, message.payload2, complexity)
+
 		} else {
-			node.substate = "WaitingToReply"
-			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level})
+			node.waitingToReply = true
+			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level, payload2: message.payload2})
 		}
 
 	case "mergeAccepted":
@@ -212,6 +268,9 @@ func villageInstructions(node *Node, message *Message, complexity *int) {
 			sendMessage(node, node.parent, &outMessage, complexity)
 			node.neighbors[node.parent] = 2
 			node.parent = message.sender
+			if node.waitingForReply == true && node.nodesIveRequested[message.sender] == 1 {
+				node.waitingForReply = false
+			}
 			if node.neighbors[message.sender] == 0 {
 				node.chidlrenCount++
 			}
@@ -227,7 +286,7 @@ func villageInstructions(node *Node, message *Message, complexity *int) {
 			outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "external"}
 			sendMessage(node, message.sender, &outMessage, complexity)
 		} else {
-			node.substate = "WaitingToReply"
+			node.waitingToReply = true
 			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level})
 		}
 
@@ -254,6 +313,8 @@ func villageInstructions(node *Node, message *Message, complexity *int) {
 		fmt.Println("here5", node.name, node.fringeEdgeFoundResponceCount, node.chidlrenCount, node.foundMySmallestExternalEdge)
 		if node.fringeEdgeFoundResponceCount == node.chidlrenCount && node.foundMySmallestExternalEdge {
 			sendUpSmallestFringeEdgeFound(node, complexity)
+			//no longer searching
+			node.searchingForFringEdge = false
 		}
 
 	case "terminationBroadcast":
@@ -281,49 +342,36 @@ func downTownInstructions(node *Node, message *Message, complexity *int) {
 				node.state = "Done"
 				break
 			}
+			//no longer searching
+			node.searchingForFringEdge = false
 			outMessage := Message{catagory: "mergeRequest", level: node.level, city: node.city, destinationPath: node.smallestExternalEdgeFound.callbackPath, payload: len(node.smallestExternalEdgeFound.callbackPath.edges), payload2: node.name}
 			if outMessage.payload == 0 {
-				node.substate = "WaitingForReply"
+				node.waitingForReply = true
 				node.nodesIveRequested[node.smallestExternalEdgeFound.sender] = 1
 			}
 			sendMessage(node, node.smallestExternalEdgeFound.sender, &outMessage, complexity)
 		}
 
 	case "mergeRequest":
-		outMessage := Message{catagory: "getAbsorbed", level: node.level, city: node.city}
 		if node.level > message.level {
+			//absorbtion case
 			//fmt.Println("here me2", node.name, "target", message.sender)
+			outMessage := Message{catagory: "getAbsorbed", level: node.level, city: node.city}
 			sendMessage(node, message.sender, &outMessage, complexity)
+			if node.searchingForFringEdge == true {
+				outMessage2 := Message{catagory: "findSmallestFringeEdge", level: node.level, city: node.city, payload: math.MaxInt, callbackPath: EdgePath{edges: []int{}}}
+				sendMessage(node, message.sender, &outMessage2, complexity)
+			}
 			node.neighbors[message.sender] = 2
 			node.chidlrenCount++
-		} else if node.substate == "WaitingForReply" && node.nodesIveRequested[message.sender] == 1 {
+		} else if node.waitingForReply == true && node.nodesIveRequested[message.sender] == 1 && node.level == message.level {
 			//friendly merge, since this is a request from the node I've already requests
-			fmt.Println("here me", node.name, "target", message.sender)
-			//here we broadcast first so only the old children recieve it, not the possible new children from the merge
-			node.city = message.sender
-			node.level++
-			outMessage := Message{catagory: "mergeAccepted", level: node.level, city: node.city}
-			broadcast(node, &outMessage, complexity)
-			if node.name < message.payload2 {
-				node.state = "Downtown"
-				node.neighbors[message.sender] = 2
-				node.chidlrenCount++
-			} else {
-				node.parent = message.sender
-				node.neighbors[message.sender] = 3
-				node.state = "Village"
-			}
-			nodeHasChangedLevel(node, complexity)
-			if node.state == "Downtown" {
-				outMessage2 := Message{catagory: "findSmallestFringeEdge", city: node.city, level: node.level, payload: math.MaxInt}
-				broadcast(node, &outMessage2, complexity)
-				queryNonChildren(node, complexity)
-			}
+			friendlyMergeDowntown(node, message.sender, message.payload2, complexity)
 
 		} else {
 			//fmt.Println("here me2", node.name, "target", message.sender)
-			node.substate = "WaitingToReply"
-			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level})
+			node.waitingToReply = true
+			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level, payload2: message.payload2})
 		}
 
 	case "mergeAccepted":
@@ -352,6 +400,9 @@ func downTownInstructions(node *Node, message *Message, complexity *int) {
 		node.city = message.city
 		node.level = message.level
 		node.state = "Village"
+		if node.waitingForReply == true && node.nodesIveRequested[message.sender] == 1 {
+			node.waitingForReply = false
+		}
 		if node.neighbors[message.sender] == 2 {
 			node.chidlrenCount--
 		}
@@ -367,7 +418,7 @@ func downTownInstructions(node *Node, message *Message, complexity *int) {
 			outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "external"}
 			sendMessage(node, message.sender, &outMessage, complexity)
 		} else {
-			node.substate = "WaitingToReply"
+			node.waitingToReply = true
 			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level})
 		}
 
@@ -395,10 +446,11 @@ func downTownInstructions(node *Node, message *Message, complexity *int) {
 		if node.fringeEdgeFoundResponceCount == node.chidlrenCount && node.foundMySmallestExternalEdge {
 			outMessage := Message{catagory: "mergeRequest", level: node.level, city: node.city, destinationPath: node.smallestExternalEdgeFound.callbackPath, payload: len(node.smallestExternalEdgeFound.callbackPath.edges), payload2: node.name}
 			if outMessage.payload == 0 {
-				node.substate = "WaitingForReply"
+				node.waitingForReply = true
 				node.nodesIveRequested[node.smallestExternalEdgeFound.sender] = 1
 			}
-			fmt.Println("here3", node.name)
+			//no longer searching
+			node.searchingForFringEdge = true
 			sendMessage(node, node.smallestExternalEdgeFound.sender, &outMessage, complexity)
 			node.foundMySmallestExternalEdge = false
 			node.fringeEdgeFoundResponceCount = 0
