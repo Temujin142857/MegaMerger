@@ -92,3 +92,12 @@ func remove(s []PendingMergeRequest, i int) []PendingMergeRequest {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }
+
+func cloneMessage(m Message) Message {
+	clone := m
+
+	clone.callbackPath.edges = append([]int(nil), m.callbackPath.edges...)
+	clone.destinationPath.edges = append([]int(nil), m.destinationPath.edges...)
+
+	return clone
+}

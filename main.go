@@ -35,7 +35,7 @@ func main() {
 	flag.Parse()
 	fmt.Println("procedureNum:", procedureNum, ", filePath:", filePath, ", withWeight:", withWeight)
 	setupOutputFolder()
-
+	startTrace()
 	switch procedureNum {
 	case 0:
 		runFromFile()
