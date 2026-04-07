@@ -17,6 +17,7 @@ type Message struct {
 	destinationPath EdgePath
 	answer          string
 	payload         int
+	payload2        int
 }
 
 type PendingMergeRequest struct {
@@ -34,6 +35,7 @@ type Node struct {
 	edges  map[int]Vertex
 	//has different meaning in setup, but after gets converted to map edge id->0 if unkonwn, 1 if internal, 2 if a child, 3 if parent
 	neighbors                    map[int]int
+	nodesIveRequested            map[int]int
 	chidlrenCount                int
 	foundMySmallestExternalEdge  bool
 	smallestExternalEdgeFound    Message
@@ -45,13 +47,13 @@ type Node struct {
 	inbox                        chan Message
 }
 
-func NewNode(id int, initiatior bool) Node {
+func NewNode(id int, initiatior bool, nodesNum int) Node {
 	state := "Asleep"
 	if initiatior {
 		state = "Downtown"
 	}
-	n := Node{name: id, level: 1, city: id, edges: make(map[int]Vertex), neighbors: make(map[int]int), chidlrenCount: 0,
-		foundMySmallestExternalEdge: false, state: state, substate: "", fringeEdgeFoundResponceCount: 0, initiator: initiatior}
+	n := Node{name: id, level: 1, city: id, edges: make(map[int]Vertex), neighbors: make(map[int]int), chidlrenCount: 0, nodesIveRequested: make(map[int]int),
+		foundMySmallestExternalEdge: false, state: state, substate: "", fringeEdgeFoundResponceCount: 0, initiator: initiatior, inbox: make(chan Message, nodesNum)}
 	return n
 }
 
@@ -84,4 +86,9 @@ func (s *EdgePath) Peek() int {
 
 func (s *EdgePath) IsEmpty() bool {
 	return len(s.edges) == 0
+}
+
+func remove(s []PendingMergeRequest, i int) []PendingMergeRequest {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
 }
