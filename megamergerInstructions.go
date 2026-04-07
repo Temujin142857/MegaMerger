@@ -59,10 +59,10 @@ func sendUpSmallestFringeEdgeFound(node *Node, complexity *int) {
 	sendMessage(node, node.parent, &node.smallestExternalEdgeFound, complexity)
 	node.fringeEdgeFoundResponceCount = 0
 	node.foundMySmallestExternalEdge = false
-	node.smallestExternalEdgeFound = Message{catagory: "smallestFringeEdgeFound", payload: math.MaxInt}
+	node.smallestExternalEdgeFound = Message{catagory: "smallestFringeEdgeFound", payload: math.MaxInt, callbackPath: EdgePath{}}
 }
 
-func queryNonChildren(node *Node, message Message, compexity *int) {
+func queryNonChildren(node *Node, compexity *int) {
 	for k, v := range node.neighbors {
 		if v == 0 {
 			outMessage := Message{catagory: "cityCheck", level: node.level, city: node.city}
@@ -70,6 +70,8 @@ func queryNonChildren(node *Node, message Message, compexity *int) {
 			return
 		}
 	}
+	println("node has no children but called queryNonChildren", node.name)
+	node.foundMySmallestExternalEdge = true
 }
 
 func start(node *Node, complexity *int) {
@@ -108,27 +110,31 @@ func nodeHasChangedLevel(node *Node, complexity *int) {
 func villageInstructions(node *Node, message *Message, complexity *int) {
 	switch message.catagory {
 	case "findSmallestFringeEdge":
+		fmt.Println("findsmallest edge", *node)
 		if len(node.neighbors) == 1 {
-			outMessage := Message{catagory: "smallestFringeEdgeFound", level: node.level, city: node.city, payload: math.MaxInt}
+			outMessage := Message{catagory: "smallestFringeEdgeFound", level: node.level, city: node.city, callbackPath: EdgePath{edges: []int{}}, payload: math.MaxInt}
 			sendMessage(node, node.parent, &outMessage, complexity)
 		}
 		if len(node.neighbors)-node.chidlrenCount == 1 {
+			fmt.Println("node has no external neighbors", node.name)
 			node.foundMySmallestExternalEdge = true
 		}
-		outMessage := Message{catagory: "findSmallestFringeEdge", level: node.level, city: node.city, payload: math.MaxInt}
+		outMessage := Message{catagory: "findSmallestFringeEdge", level: node.level, city: node.city, payload: math.MaxInt, callbackPath: EdgePath{edges: []int{}}}
 		broadcast(node, &outMessage, complexity)
-		outMessage2 := Message{catagory: "cityCheck", level: node.level, city: node.city}
-		queryNonChildren(node, outMessage2, complexity)
+		if !node.foundMySmallestExternalEdge {
+			queryNonChildren(node, complexity)
+		}
 
 	case "smallestFringeEdgeFound":
 		if message.sender == node.parent {
 			panic("village recieved smallest fringe edge from parent")
 		}
 		node.fringeEdgeFoundResponceCount++
-		if message.payload < node.smallestExternalEdgeFound.payload {
+		if message.payload <= node.smallestExternalEdgeFound.payload {
 			node.smallestExternalEdgeFound = *message
 			node.smallestExternalEdgeFound.callbackPath.edges = append(node.smallestExternalEdgeFound.callbackPath.edges, message.sender)
 		}
+		fmt.Println("node recieved smallestFringeEdge", node.name, node.foundMySmallestExternalEdge, node.chidlrenCount, node.fringeEdgeFoundResponceCount)
 		if node.fringeEdgeFoundResponceCount == node.chidlrenCount && node.foundMySmallestExternalEdge {
 			sendUpSmallestFringeEdgeFound(node, complexity)
 		}
@@ -149,6 +155,7 @@ func villageInstructions(node *Node, message *Message, complexity *int) {
 			node.neighbors[message.sender] = 2
 			node.chidlrenCount++
 		} else if node.substate == "WaitingForReply" && node.nodesIveRequested[message.sender] == 1 {
+			//friendly merge, since this is a request from the node I've already requests
 			oldParent := node.parent
 			node.neighbors[oldParent] = 2
 			node.chidlrenCount++
@@ -184,8 +191,10 @@ func villageInstructions(node *Node, message *Message, complexity *int) {
 		} else if node.neighbors[message.sender] == 1 {
 			panic("village recieved merge accepted from internal non child/parent node")
 		} else {
-
+			//this would be for if they recieved it from an external node
+			//but that would be a freindly merger, which I handle when they exchange merge requests, without needing an accept message
 		}
+		nodeHasChangedLevel(node, complexity)
 
 	case "getAbsorbed":
 		if message.level <= node.level {
@@ -203,6 +212,9 @@ func villageInstructions(node *Node, message *Message, complexity *int) {
 			sendMessage(node, node.parent, &outMessage, complexity)
 			node.neighbors[node.parent] = 2
 			node.parent = message.sender
+			if node.neighbors[message.sender] == 0 {
+				node.chidlrenCount++
+			}
 			node.neighbors[message.sender] = 3
 		}
 		nodeHasChangedLevel(node, complexity)
@@ -220,9 +232,18 @@ func villageInstructions(node *Node, message *Message, complexity *int) {
 		}
 
 	case "cityCheckReply":
-		fmt.Println("here4", node.name, node.fringeEdgeFoundResponceCount, node.chidlrenCount, node.foundMySmallestExternalEdge)
 		if message.answer == "internal" {
 			node.neighbors[message.sender] = 1
+			allVisited := true
+			for _, v := range node.neighbors {
+				if v == 0 {
+					allVisited = false
+					queryNonChildren(node, complexity)
+				}
+			}
+			if allVisited {
+				node.foundMySmallestExternalEdge = true
+			}
 		} else {
 			node.foundMySmallestExternalEdge = true
 			if message.sender < node.smallestExternalEdgeFound.payload {
@@ -230,7 +251,7 @@ func villageInstructions(node *Node, message *Message, complexity *int) {
 				node.smallestExternalEdgeFound.payload = message.sender
 			}
 		}
-		fmt.Println("here4", node.name, node.fringeEdgeFoundResponceCount, node.chidlrenCount, node.foundMySmallestExternalEdge)
+		fmt.Println("here5", node.name, node.fringeEdgeFoundResponceCount, node.chidlrenCount, node.foundMySmallestExternalEdge)
 		if node.fringeEdgeFoundResponceCount == node.chidlrenCount && node.foundMySmallestExternalEdge {
 			sendUpSmallestFringeEdgeFound(node, complexity)
 		}
@@ -251,6 +272,8 @@ func downTownInstructions(node *Node, message *Message, complexity *int) {
 		if message.payload < node.smallestExternalEdgeFound.payload {
 			node.smallestExternalEdgeFound = *message
 		}
+		fmt.Println("downtown recieved smallestFringeEdge", node.name, node.foundMySmallestExternalEdge, node.chidlrenCount, node.fringeEdgeFoundResponceCount)
+		fmt.Println("downtown recieved smallestFringeEdge2", node.name, node.neighbors)
 		if node.fringeEdgeFoundResponceCount == node.chidlrenCount && node.foundMySmallestExternalEdge {
 			if node.smallestExternalEdgeFound.payload == math.MaxInt {
 				outMessage := Message{catagory: "terminationBroadcast"}
@@ -274,7 +297,13 @@ func downTownInstructions(node *Node, message *Message, complexity *int) {
 			node.neighbors[message.sender] = 2
 			node.chidlrenCount++
 		} else if node.substate == "WaitingForReply" && node.nodesIveRequested[message.sender] == 1 {
+			//friendly merge, since this is a request from the node I've already requests
 			fmt.Println("here me", node.name, "target", message.sender)
+			//here we broadcast first so only the old children recieve it, not the possible new children from the merge
+			node.city = message.sender
+			node.level++
+			outMessage := Message{catagory: "mergeAccepted", level: node.level, city: node.city}
+			broadcast(node, &outMessage, complexity)
 			if node.name < message.payload2 {
 				node.state = "Downtown"
 				node.neighbors[message.sender] = 2
@@ -284,14 +313,11 @@ func downTownInstructions(node *Node, message *Message, complexity *int) {
 				node.neighbors[message.sender] = 3
 				node.state = "Village"
 			}
-			node.city = message.sender
-			node.level++
-			outMessage := Message{catagory: "mergeAccepted", level: node.level, city: node.city}
-			broadcast(node, &outMessage, complexity)
 			nodeHasChangedLevel(node, complexity)
 			if node.state == "Downtown" {
 				outMessage2 := Message{catagory: "findSmallestFringeEdge", city: node.city, level: node.level, payload: math.MaxInt}
 				broadcast(node, &outMessage2, complexity)
+				queryNonChildren(node, complexity)
 			}
 
 		} else {
@@ -348,6 +374,16 @@ func downTownInstructions(node *Node, message *Message, complexity *int) {
 	case "cityCheckReply":
 		if message.answer == "internal" {
 			node.neighbors[message.sender] = 1
+			allVisited := true
+			for _, v := range node.neighbors {
+				if v == 0 {
+					allVisited = false
+					queryNonChildren(node, complexity)
+				}
+			}
+			if allVisited {
+				node.foundMySmallestExternalEdge = true
+			}
 		} else {
 			node.foundMySmallestExternalEdge = true
 			if message.sender < node.smallestExternalEdgeFound.payload {

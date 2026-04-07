@@ -1,5 +1,7 @@
 package main
 
+import "math"
+
 var STATES = [...]string{"DOWNTOWN", "ASLEEP", "VILLAGE", "DONE"}
 var MESSAGE_CATEGORIES = [...]string{"FIND_SMALLEST_FRINGE_EDGE", "SMALLEST_FRINGE_EDGE_FOUND", "MERE_REQUEST", "MERGE_REQUESTED", "GET_ABSORBED", "WE_ABSORBED_THEM", "CITY_CHECK"}
 var SUB_STATES = [...]string{"WAITING_TO_REPLY"}
@@ -53,7 +55,7 @@ func NewNode(id int, initiatior bool, nodesNum int) Node {
 		state = "Downtown"
 	}
 	n := Node{name: id, level: 1, city: id, edges: make(map[int]Vertex), neighbors: make(map[int]int), chidlrenCount: 0, nodesIveRequested: make(map[int]int),
-		foundMySmallestExternalEdge: false, state: state, substate: "", fringeEdgeFoundResponceCount: 0, initiator: initiatior, inbox: make(chan Message, nodesNum)}
+		foundMySmallestExternalEdge: false, smallestExternalEdgeFound: Message{catagory: "smallestFringeEdgeFound", payload: math.MaxInt, callbackPath: EdgePath{edges: []int{}}}, state: state, substate: "", fringeEdgeFoundResponceCount: 0, initiator: initiatior, inbox: make(chan Message, nodesNum)}
 	return n
 }
 
