@@ -34,6 +34,12 @@ type PendingMergeRequest struct {
 	friendly bool
 }
 
+type PendingCityCheck struct {
+	sender int
+	level  int
+	city   int
+}
+
 // parent and children are indexes for the edges array
 type Node struct {
 	name  int
@@ -53,6 +59,8 @@ type Node struct {
 	waitingToFriendlyMerge      bool
 	waitingForReply             bool
 	searchingForFringEdge       bool
+	waitingToReplyToCityCheck   bool
+	pendingCityChecks           []PendingCityCheck
 	//requests that will be resolved via absorbtion or freindly merge later on
 	pendingMergeRequests         []PendingMergeRequest
 	fringeEdgeFoundResponceCount int
@@ -101,7 +109,12 @@ func (s *EdgePath) IsEmpty() bool {
 	return len(s.edges) == 0
 }
 
-func remove(s []PendingMergeRequest, i int) []PendingMergeRequest {
+func removeMR(s []PendingMergeRequest, i int) []PendingMergeRequest {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
+func removeCC(s []PendingCityCheck, i int) []PendingCityCheck {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }

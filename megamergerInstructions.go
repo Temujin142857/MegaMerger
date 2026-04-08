@@ -132,6 +132,22 @@ func friendlyMergeDowntown(node *Node, sender int, payload2 int, complexity *int
 	}
 }
 
+func cityCheckLogic(node *Node, sender int, level int, city int, complexity *int, setWait bool) bool {
+	if city == node.city {
+		outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "internal"}
+		sendMessage(node, sender, &outMessage, complexity)
+		return true
+	} else if node.level >= level {
+		outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "external"}
+		sendMessage(node, sender, &outMessage, complexity)
+		return true
+	} else if setWait {
+		node.waitingToReplyToCityCheck = true
+		node.pendingCityChecks = append(node.pendingCityChecks, PendingCityCheck{sender: sender, level: level, city: city})
+	}
+	return false
+}
+
 func nodeHasChangedLevel(node *Node, complexity *int) {
 	if node.waitingToReply == true {
 		//loop through beinding absorbtions
@@ -139,7 +155,7 @@ func nodeHasChangedLevel(node *Node, complexity *int) {
 			if node.pendingMergeRequests[i].friendly == false && node.pendingMergeRequests[i].level < node.level {
 				outMessage := Message{catagory: "getAbsorbed", level: node.level, city: node.city}
 				sendMessage(node, node.pendingMergeRequests[i].sender, &outMessage, complexity)
-				node.pendingMergeRequests = remove(node.pendingMergeRequests, i)
+				node.pendingMergeRequests = removeMR(node.pendingMergeRequests, i)
 				fmt.Println("levelc:", len(node.pendingMergeRequests), node.name)
 				if len(node.pendingMergeRequests) == 0 && len(node.pendingMergeRequests) == 0 {
 					node.waitingToReply = false
@@ -153,7 +169,7 @@ func nodeHasChangedLevel(node *Node, complexity *int) {
 				} else if node.state == "Village" {
 					friendlyMergeVillage(node, node.pendingMergeRequests[i].sender, node.pendingMergeRequests[i].payload2, complexity)
 				}
-				node.pendingMergeRequests = remove(node.pendingMergeRequests, i)
+				node.pendingMergeRequests = removeMR(node.pendingMergeRequests, i)
 				fmt.Println("levelc:", len(node.pendingMergeRequests), node.name)
 				if len(node.pendingMergeRequests) == 0 {
 					node.waitingToFriendlyMerge = false
@@ -164,6 +180,23 @@ func nodeHasChangedLevel(node *Node, complexity *int) {
 				}
 				//since we're removing an element, we back up to get the new element in this spot
 				i--
+			}
+		}
+	}
+	if node.waitingToReplyToCityCheck == true {
+		for i := 0; i < len(node.pendingCityChecks); i++ {
+			if node.pendingCityChecks[i].level == node.level {
+				didSend := cityCheckLogic(node, node.pendingCityChecks[i].sender, node.pendingCityChecks[i].level, node.pendingCityChecks[i].city, complexity, false)
+				if didSend {
+					node.pendingCityChecks = removeCC(node.pendingCityChecks, i)
+					if len(node.pendingCityChecks) == 0 {
+						node.waitingToReplyToCityCheck = false
+						return
+					}
+					i--
+				}
+			} else if node.pendingCityChecks[i].level > node.level {
+				panic(fmt.Sprint("city check, I was waiting for equality, but somehow I'm bigger than it now? me, their edge", node.name, node.pendingCityChecks[i].sender))
 			}
 		}
 	}
@@ -279,16 +312,7 @@ func villageInstructions(node *Node, message *Message, complexity *int) {
 		nodeHasChangedLevel(node, complexity)
 
 	case "cityCheck":
-		if message.city == node.city {
-			outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "internal"}
-			sendMessage(node, message.sender, &outMessage, complexity)
-		} else if node.level >= message.level {
-			outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "external"}
-			sendMessage(node, message.sender, &outMessage, complexity)
-		} else {
-			node.waitingToReply = true
-			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level})
-		}
+		cityCheckLogic(node, message.sender, message.level, message.city, complexity, true)
 
 	case "cityCheckReply":
 		if message.answer == "internal" {
@@ -411,16 +435,7 @@ func downTownInstructions(node *Node, message *Message, complexity *int) {
 		nodeHasChangedLevel(node, complexity)
 
 	case "cityCheck":
-		if message.city == node.city {
-			outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "internal"}
-			sendMessage(node, message.sender, &outMessage, complexity)
-		} else if node.level >= message.level {
-			outMessage := Message{catagory: "cityCheckReply", level: node.level, city: node.city, answer: "external"}
-			sendMessage(node, message.sender, &outMessage, complexity)
-		} else {
-			node.waitingToReply = true
-			node.pendingMergeRequests = append(node.pendingMergeRequests, PendingMergeRequest{sender: message.sender, level: message.level})
-		}
+		cityCheckLogic(node, message.sender, message.level, message.city, complexity, true)
 
 	case "cityCheckReply":
 		if message.answer == "internal" {
