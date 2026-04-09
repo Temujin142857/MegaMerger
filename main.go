@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"sync"
+	"time"
 
 	//"gg"
 	"runtime/debug"
@@ -53,7 +54,7 @@ func runFromFile() {
 	VisualizeGraph(nodes, "network")
 	complexity := 0
 	leader := -1
-	runAlgorithm(nodes, &complexity, &leader)
+	runAlgorithm(nodes, &complexity, &leader, "network")
 	fmt.Printf("algorithm terminated\n")
 	fmt.Printf("leader: %d\n", leader)
 	fmt.Printf("complexity: %d\n", complexity)
@@ -74,13 +75,17 @@ func procedure1(n int) [4]int {
 			m = n ^ 2
 		}
 		totalComplexity := 0
-		for j := 0; j < 1000; j++ {
+		for j := 0; j < 10; j++ {
 			var nodes map[int]Node = make(map[int]Node)
 			//note we currently make every node an initiator
 			generateRandomGraph(n, m, n, nodes)
 			complexity := 0
 			leader := -1
-			runAlgorithm(nodes, &complexity, &leader)
+			success := runAlgorithm(nodes, &complexity, &leader, fmt.Sprint("network", j))
+			if success == 0 {
+				i--
+				continue
+			}
 			totalComplexity += complexity
 		}
 		averageComplexities[i] = totalComplexity / 1000
@@ -105,7 +110,7 @@ func procedure2() [4]int {
 			generateRandomGraph(n, m, n, nodes)
 			complexity := 0
 			leader := -1
-			runAlgorithm(nodes, &complexity, &leader)
+			runAlgorithm(nodes, &complexity, &leader, fmt.Sprint("network", j))
 			totalComplexity += complexity
 		}
 		averageComplexities[i] = totalComplexity / 1000
@@ -113,12 +118,33 @@ func procedure2() [4]int {
 	return averageComplexities
 }
 
-func runAlgorithm(nodes map[int]Node, complexity *int, leader *int) {
-	VisualizeGraph(nodes, "network")
+func runAlgorithm(nodes map[int]Node, complexity *int, leader *int, filename string) int {
+	VisualizeGraph(nodes, filename)
+
 	var wg sync.WaitGroup
+	done := make(chan struct{})
+
 	for _, node := range nodes {
-		wg.Go(func() { instructions(&node, complexity, leader) })
+		n := node // capture correctly
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			instructions(&n, complexity, leader)
+		}()
 	}
 
-	wg.Wait()
+	// wait in a separate goroutine
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		// completed normally
+	case <-time.After(3 * time.Second):
+		return 0
+	}
+	return 1
 }

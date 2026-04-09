@@ -66,7 +66,7 @@ type Node struct {
 	pendingCityChecks           []PendingCityCheck
 	//requests that will be resolved via absorbtion or freindly merge later on
 	//maps node id to the message
-	pendingMergeRequests         []PendingMergeRequest
+	pendingMergeRequests         map[int]PendingMergeRequest
 	fringeEdgeFoundResponceCount int
 	initiator                    bool
 	inbox                        chan Message
@@ -78,7 +78,7 @@ func NewNode(id int, initiatior bool, nodesNum int) Node {
 	if initiatior {
 		state = "Downtown"
 	}
-	n := Node{name: id, level: 1, city: id, edges: make(map[int]Vertex), neighbors: make(map[int]int), chidlrenCount: 0, nodesIveRequested: make(map[int]int),
+	n := Node{name: id, level: 1, city: id, edges: make(map[int]Vertex), neighbors: make(map[int]int), chidlrenCount: 0, nodesIveRequested: make(map[int]int), pendingMergeRequests: make(map[int]PendingMergeRequest),
 		nodesThatHaveRequestedMe: make(map[int]int), foundMySmallestExternalEdge: false, smallestExternalEdgeFound: Message{catagory: "smallestFringeEdgeFound", smallestFringeEdgeFoundNum: math.MaxInt,
 			callbackPath: EdgePath{edges: []int{}}}, state: state, fringeEdgeFoundResponceCount: 0, initiator: initiatior, inbox: make(chan Message, nodesNum)}
 	return n
