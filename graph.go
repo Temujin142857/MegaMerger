@@ -22,6 +22,7 @@ type Message struct {
 	//answer will be internal or external
 	answer string
 	//payload is for smallestFringe edge found, it's the smallest edge found so far
+	//payload is the used as a countdown on the way back as part of a fringe
 	payload int
 	//payload 2 is the id of the sender
 	payload2 int

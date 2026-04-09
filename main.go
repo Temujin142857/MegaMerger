@@ -114,7 +114,7 @@ func procedure2() [4]int {
 }
 
 func runAlgorithm(nodes map[int]Node, complexity *int, leader *int) {
-	//VisualizeGraph(nodes, "network")
+	VisualizeGraph(nodes, "network")
 	var wg sync.WaitGroup
 	for _, node := range nodes {
 		wg.Go(func() { instructions(&node, complexity, leader) })
