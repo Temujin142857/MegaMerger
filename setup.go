@@ -47,8 +47,58 @@ func generateRandomGraph(nodesNum int, connectionsNum int, initiatorNum int, nod
 		i++
 	}
 
+	components := getComponents(nodes, nodesNum)
+
+	if len(components) > 1 {
+		connectComponents(nodes, components, connectionsNum)
+	}
+
 	remakeNodeNeighbors(nodes)
 
+}
+
+func getComponents(nodes map[int]Node, nodesNum int) [][]int {
+	visited := make(map[int]bool)
+	var components [][]int
+
+	for i := 0; i < nodesNum; i++ {
+		if visited[i] {
+			continue
+		}
+
+		stack := []int{i}
+		var component []int
+		visited[i] = true
+
+		for len(stack) > 0 {
+			curr := stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+			component = append(component, curr)
+
+			for neighbor := range nodes[curr].neighbors {
+				if nodes[curr].neighbors[neighbor] == 1 && !visited[neighbor] {
+					visited[neighbor] = true
+					stack = append(stack, neighbor)
+				}
+			}
+		}
+
+		components = append(components, component)
+	}
+
+	return components
+}
+
+func connectComponents(nodes map[int]Node, components [][]int, connectionsNum int) {
+	for i := 0; i < len(components)-1; i++ {
+		c1 := components[i]
+		c2 := components[i+1]
+
+		n1 := c1[rand.IntN(len(c1))]
+		n2 := c2[rand.IntN(len(c2))]
+
+		connect(i+connectionsNum, n1, n2, nodes)
+	}
 }
 
 func fileSetup(filePath string, withWeight bool, initiatorNum int, nodes map[int]Node) {
@@ -94,6 +144,7 @@ func fileSetup(filePath string, withWeight bool, initiatorNum int, nodes map[int
 }
 
 func connect(i int, n1 int, n2 int, nodes map[int]Node) {
+	fmt.Println(i)
 	node1 := nodes[n1]
 	node2 := nodes[n2]
 	v := Vertex{id: i, node1: &node1, node2: &node2}

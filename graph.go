@@ -20,9 +20,9 @@ type Message struct {
 	destinationPath EdgePath
 	//the next three are optional information, only used for some messages, in retrospect multiple types of message structs would be cleaner, might change if I have time
 	//answer will be internal or external
-	answer string
-	//payload is for smallestFringe edge found, it's the smallest edge found so far
-	//payload is the used as a countdown on the way back as part of a fringe
+	answer                     string
+	smallestFringeEdgeFoundNum int
+	//payload is the used as a countdown in merge requests on their way to the fringe
 	payload int
 	//payload 2 is the id of the sender
 	//or in termination broadcast is the leader
@@ -65,6 +65,7 @@ type Node struct {
 	waitingToReplyToCityCheck   bool
 	pendingCityChecks           []PendingCityCheck
 	//requests that will be resolved via absorbtion or freindly merge later on
+	//maps node id to the message
 	pendingMergeRequests         []PendingMergeRequest
 	fringeEdgeFoundResponceCount int
 	initiator                    bool
@@ -78,7 +79,7 @@ func NewNode(id int, initiatior bool, nodesNum int) Node {
 		state = "Downtown"
 	}
 	n := Node{name: id, level: 1, city: id, edges: make(map[int]Vertex), neighbors: make(map[int]int), chidlrenCount: 0, nodesIveRequested: make(map[int]int),
-		nodesThatHaveRequestedMe: make(map[int]int), foundMySmallestExternalEdge: false, smallestExternalEdgeFound: Message{catagory: "smallestFringeEdgeFound", payload: math.MaxInt,
+		nodesThatHaveRequestedMe: make(map[int]int), foundMySmallestExternalEdge: false, smallestExternalEdgeFound: Message{catagory: "smallestFringeEdgeFound", smallestFringeEdgeFoundNum: math.MaxInt,
 			callbackPath: EdgePath{edges: []int{}}}, state: state, fringeEdgeFoundResponceCount: 0, initiator: initiatior, inbox: make(chan Message, nodesNum)}
 	return n
 }
