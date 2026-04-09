@@ -74,7 +74,8 @@ func NewNode(id int, initiatior bool, nodesNum int) Node {
 		state = "Downtown"
 	}
 	n := Node{name: id, level: 1, city: id, edges: make(map[int]Vertex), neighbors: make(map[int]int), chidlrenCount: 0, nodesIveRequested: make(map[int]int),
-		foundMySmallestExternalEdge: false, smallestExternalEdgeFound: Message{catagory: "smallestFringeEdgeFound", payload: math.MaxInt, callbackPath: EdgePath{edges: []int{}}}, state: state, substate: "", fringeEdgeFoundResponceCount: 0, initiator: initiatior, inbox: make(chan Message, nodesNum)}
+		foundMySmallestExternalEdge: false, smallestExternalEdgeFound: Message{catagory: "smallestFringeEdgeFound", payload: math.MaxInt,
+			callbackPath: EdgePath{edges: []int{}}}, state: state, fringeEdgeFoundResponceCount: 0, initiator: initiatior, inbox: make(chan Message, nodesNum)}
 	return n
 }
 
