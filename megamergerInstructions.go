@@ -81,7 +81,7 @@ func queryNonChildren(node *Node, compexity *int) {
 		outMessage := Message{catagory: "cityCheck", level: node.level, city: node.city}
 		sendMessage(node, mink, &outMessage, compexity)
 	} else {
-		println("node has no children but called queryNonChildren", node.name)
+		//fmt.println("node has no children but called queryNonChildren", node.name)
 		node.foundMySmallestExternalEdge = true
 	}
 }
