@@ -25,6 +25,7 @@ type Message struct {
 	//payload is the used as a countdown on the way back as part of a fringe
 	payload int
 	//payload 2 is the id of the sender
+	//or in termination broadcast is the leader
 	payload2 int
 }
 
@@ -32,7 +33,6 @@ type PendingMergeRequest struct {
 	sender   int
 	level    int
 	payload2 int
-	friendly bool
 }
 
 type PendingCityCheck struct {
@@ -50,14 +50,16 @@ type Node struct {
 	parent int
 	edges  map[int]Vertex
 	//has different meaning in setup, but after gets converted to map edge id->0 if unkonwn, 1 if internal, 2 if a child, 3 if parent
-	neighbors                   map[int]int
-	nodesIveRequested           map[int]int
+	neighbors map[int]int
+	//maps local vertex to 1 or 0
+	nodesIveRequested map[int]int
+	//maps the id of the node that sent me the request, to a 0 or 1
+	nodesThatHaveRequestedMe    map[int]int
 	chidlrenCount               int
 	foundMySmallestExternalEdge bool
 	smallestExternalEdgeFound   Message
 	state                       string
 	waitingToReply              bool
-	waitingToFriendlyMerge      bool
 	waitingForReply             bool
 	searchingForFringEdge       bool
 	waitingToReplyToCityCheck   bool
@@ -67,6 +69,7 @@ type Node struct {
 	fringeEdgeFoundResponceCount int
 	initiator                    bool
 	inbox                        chan Message
+	leader                       int
 }
 
 func NewNode(id int, initiatior bool, nodesNum int) Node {
@@ -75,7 +78,7 @@ func NewNode(id int, initiatior bool, nodesNum int) Node {
 		state = "Downtown"
 	}
 	n := Node{name: id, level: 1, city: id, edges: make(map[int]Vertex), neighbors: make(map[int]int), chidlrenCount: 0, nodesIveRequested: make(map[int]int),
-		foundMySmallestExternalEdge: false, smallestExternalEdgeFound: Message{catagory: "smallestFringeEdgeFound", payload: math.MaxInt,
+		nodesThatHaveRequestedMe: make(map[int]int), foundMySmallestExternalEdge: false, smallestExternalEdgeFound: Message{catagory: "smallestFringeEdgeFound", payload: math.MaxInt,
 			callbackPath: EdgePath{edges: []int{}}}, state: state, fringeEdgeFoundResponceCount: 0, initiator: initiatior, inbox: make(chan Message, nodesNum)}
 	return n
 }
