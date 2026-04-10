@@ -56,7 +56,7 @@ func runFromFile() {
 	runAlgorithm(nodes, &messages, &leader, "network")
 	fmt.Printf("algorithm terminated\n")
 	fmt.Printf("leader: %d\n", leader)
-	fmt.Printf("complexity: %d\n", messages)
+	fmt.Printf("messages: %d\n", messages)
 }
 
 func procedure1(n int) [4]int {
