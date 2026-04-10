@@ -47,10 +47,10 @@ func sendMessage(node *Node, target int, message *Message, complexity *int) {
 	//fmt.Println(node.edges[target])
 	if node.edges[target].node1.name == node.name {
 		node.edges[target].node2.inbox <- m
-		//fmt.Println(node.name, node.edges[target].node2.name, m)
+		fmt.Println(node.name, node.edges[target].node2.name, m)
 	} else {
 		node.edges[target].node1.inbox <- m
-		//fmt.Println(node.name, node.edges[target].node1.name, m)
+		fmt.Println(node.name, node.edges[target].node1.name, m)
 	}
 }
 
@@ -447,7 +447,7 @@ func downTownInstructions(node *Node, message *Message, complexity *int) {
 				} else {
 					node.waitingForReply = true
 					node.nodesIveRequested[node.smallestExternalEdgeFound.sender] = 1
-					println("setting waitingToReply from frnge found", node.smallestExternalEdgeFound.sender, message.payload2)
+					//println("setting waitingToReply from frnge found", node.smallestExternalEdgeFound.sender, message.payload2)
 					sendMessage(node, node.smallestExternalEdgeFound.sender, &outMessage, complexity)
 				}
 
@@ -477,7 +477,7 @@ func downTownInstructions(node *Node, message *Message, complexity *int) {
 		} else {
 			node.waitingToReply = true
 			node.nodesThatHaveRequestedMe[message.payload2] = 1
-			println("setting waitingToReply", message.sender, message.payload2, message.level)
+			//println("setting waitingToReply", message.sender, message.payload2, message.level)
 			node.pendingMergeRequests[message.sender] = PendingMergeRequest{sender: message.sender, level: message.level, payload2: message.payload2}
 		}
 

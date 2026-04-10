@@ -144,7 +144,7 @@ func fileSetup(filePath string, withWeight bool, initiatorNum int, nodes map[int
 }
 
 func connect(i int, n1 int, n2 int, nodes map[int]Node) {
-	fmt.Println(i)
+	//fmt.Println(i)
 	node1 := nodes[n1]
 	node2 := nodes[n2]
 	v := Vertex{id: i, node1: &node1, node2: &node2}

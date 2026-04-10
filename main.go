@@ -51,12 +51,12 @@ func runFromFile() {
 	//note here nodenum is the amount of initiators
 	fileSetup(filePath, withWeight, nodeNum, nodes)
 	VisualizeGraph(nodes, "network")
-	complexity := 0
+	messages := 0
 	leader := -1
-	runAlgorithm(nodes, &complexity, &leader, "network")
+	runAlgorithm(nodes, &messages, &leader, "network")
 	fmt.Printf("algorithm terminated\n")
 	fmt.Printf("leader: %d\n", leader)
-	fmt.Printf("complexity: %d\n", complexity)
+	fmt.Printf("complexity: %d\n", messages)
 }
 
 func procedure1(n int) [4]int {
