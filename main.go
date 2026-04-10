@@ -125,7 +125,7 @@ func runAlgorithm(nodes map[int]Node, complexity *int, leader *int, filename str
 	done := make(chan struct{})
 
 	for _, node := range nodes {
-		n := node // capture correctly
+		n := node
 
 		wg.Add(1)
 		go func() {
@@ -142,7 +142,6 @@ func runAlgorithm(nodes map[int]Node, complexity *int, leader *int, filename str
 
 	select {
 	case <-done:
-		// completed normally
 	case <-time.After(3 * time.Second):
 		return 0
 	}
