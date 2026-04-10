@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 	"sync"
-	"time"
 
 	//"gg"
 	"runtime/debug"
@@ -122,28 +121,11 @@ func runAlgorithm(nodes map[int]Node, complexity *int, leader *int, filename str
 	VisualizeGraph(nodes, filename)
 
 	var wg sync.WaitGroup
-	done := make(chan struct{})
-
 	for _, node := range nodes {
-		n := node
-
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			instructions(&n, complexity, leader)
-		}()
+		wg.Go(func() { instructions(&node, complexity, leader) })
 	}
 
-	// wait in a separate goroutine
-	go func() {
-		wg.Wait()
-		close(done)
-	}()
+	wg.Wait()
 
-	select {
-	case <-done:
-	case <-time.After(3 * time.Second):
-		return 0
-	}
 	return 1
 }
