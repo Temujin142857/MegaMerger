@@ -19,14 +19,10 @@ func generateRandomGraph(nodesNum int, connectionsNum int, initiatorNum int, nod
 	}
 	//first give each node an edge, so they are not isolated
 	i := 0
-	for i < nodesNum {
+	for i := 1; i < nodesNum; i++ {
 		n1 := i
-		n2 := rand.IntN(nodesNum)
-		for n2 == n1 || nodes[n1].neighbors[n2] == 1 || nodes[n2].neighbors[n1] == 1 {
-			n2 = rand.IntN(nodesNum)
-		}
-		fmt.Println(n1, ",", n2)
-		fmt.Println(nodes[n1].neighbors[n2])
+		n2 := rand.IntN(i) // connect to any previous node
+
 		connect(i, n1, n2, nodes)
 		i++
 	}
@@ -47,11 +43,13 @@ func generateRandomGraph(nodesNum int, connectionsNum int, initiatorNum int, nod
 		i++
 	}
 
-	components := getComponents(nodes, nodesNum)
+	/*
+		components := getComponents(nodes, nodesNum)
 
-	if len(components) > 1 {
-		connectComponents(nodes, components, connectionsNum)
-	}
+		if len(components) > 1 {
+			connectComponents(nodes, components, connectionsNum)
+		}
+	*/
 
 	remakeNodeNeighbors(nodes)
 
