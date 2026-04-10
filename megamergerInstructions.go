@@ -26,6 +26,7 @@ func instructions(node *Node, complexity *int, leader *int) {
 			fmt.Println("no sleep", node.name)
 			//asleepInstructions(node, &message, complexity)
 		}
+		//not in switch, since this should check after the other function runs
 		if node.state == "Done" {
 			break
 		}
